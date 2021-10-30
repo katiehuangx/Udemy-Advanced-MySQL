@@ -41,11 +41,11 @@ Click here to expand tables!
 
 Traffic Source Analysis
 - Understanding where the customers are coming from and which channels are driving the highest quality traffic. 
-- Typically, the traffic sources are email, social media, search engine, and direct traffic. 
+- Typically, traffic sources are email, social media, search engine, and direct traffic. 
 - Looking at conversion rate (CVR) which is the percentage of the traffic that converts into sales or revenue activity.
 
 Why is it important to conduct Conversion Rate Analysis?
-- Shift budget towards search engines, campaigns, or keywords which are driving the highest conversion rate.
+- Shift budget towards search engines, campaigns, or keywords driving the highest conversion rate.
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
 
