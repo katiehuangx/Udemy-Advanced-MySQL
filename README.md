@@ -20,11 +20,26 @@
 
 <kbd><img width="330" alt="image" src="https://user-images.githubusercontent.com/81607668/139528155-b1c44957-d369-41af-a9d7-3da3928f0564.png"></kbd>
 
-`website_sessions` - Table is showing where the traffic is coming from and which source is helping to generate the orders. Records consist of unique website session id, UTM fields (associated with paid traffic and measure the effectiveness).
+`website_sessions` - Table is showing where the traffic is coming from and which source is helping to generate the orders. Records consist of unique website session id, UTM (Urchin Tracking Module) fields. UTMs tracking parameters used by Google Analytics to track paid marketing activity. 
 
 <kbd><img width="792" alt="image" src="https://user-images.githubusercontent.com/81607668/139528190-361da1c5-6512-4df7-860e-e0fdbd45f097.png"></kbd>
 
 `website_pageviews`
 
 <kbd><img width="427" alt="image" src="https://user-images.githubusercontent.com/81607668/139528173-eb792b62-c98a-47aa-bd80-bfa5c432063b.png"></kbd>
+
+***
+
+## Analyzing Traffic Sources
+
+Traffic Source Analysis
+- Understanding where the customers are coming from and which channels are driving the highest quality traffic. 
+- Typically, the traffic sources are email, social media, search engine, and direct traffic. 
+- Looking at conversion rate (CVR) which is the percentage of the traffic that converts into sales or revenue activity.
+
+Why is it important to conduct Conversion Rate Analysis?
+- Shift budget towards search engines, campaigns, or keywords which are driving the highest conversion rate.
+- Compare user behaviour across traffic sources to customize messaging strategy.
+- Identify opportunities to eliminate paid marketing channel or scale performing traffic.
+
 
