@@ -76,7 +76,9 @@ Why is it important to conduct Conversion Rate Analysis?
 
 ```sql
 SELECT 
-	utm_source, utm_campaign, http_referer, 
+	utm_source, 
+	utm_campaign, 
+	http_referer, 
   COUNT(website_session_id) AS total_sessions
 FROM website_sessions
 WHERE created_at < '2012-04-12'
@@ -96,9 +98,9 @@ We want to know from the total web sessions for `gsearch` `nonbrand` campaign, h
 - Table: sessions (count) | orders (count) | conversion rate
 
 ```sql
-SELECT 
-	COUNT(DISTINCT wb.website_session_id) AS sessions,
-	COUNT(DISTINCT o.order_id) AS orders,
+SELECT
+  COUNT(DISTINCT wb.website_session_id) AS sessions,
+  COUNT(DISTINCT o.order_id) AS orders,
   ROUND(100 * COUNT(DISTINCT o.order_id)/
     COUNT(DISTINCT wb.website_session_id),2) AS session_to_order_cvr
 FROM mavenfuzzyfactory.website_sessions wb
