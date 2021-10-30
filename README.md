@@ -4,6 +4,11 @@
 
 <kbd><img width="886" alt="image" src="https://user-images.githubusercontent.com/81607668/139528817-09766746-e26b-4aa6-9465-bd5cc58a34cc.png"></kbd>
 
+<details>
+<summary>
+Click here to expand tables!
+</summary>
+  
 `orders` - Records consist of customers' orders with order id, time when the order is created, website session id, unique user id, product id, count of products purchased, price (revenue), and cost in USD. 
 
 <kbd><img width="659" alt="image" src="https://user-images.githubusercontent.com/81607668/139528238-dade7402-2d4e-4a66-911e-ad1bd949f2ed.png"></kbd>
@@ -28,9 +33,11 @@
 
 <kbd><img width="427" alt="image" src="https://user-images.githubusercontent.com/81607668/139528173-eb792b62-c98a-47aa-bd80-bfa5c432063b.png"></kbd>
 
+</details>
+ 
 ***
 
-## Analyzing Traffic Sources
+# Analyzing Traffic Sources
 
 Traffic Source Analysis
 - Understanding where the customers are coming from and which channels are driving the highest quality traffic. 
@@ -42,4 +49,50 @@ Why is it important to conduct Conversion Rate Analysis?
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
 
+## What is the conversion rate of successful orders?
+
+- ST request: We want to know which traffic source is generating website sessions and driving the orders.
+- Get distinct website session ids and count the total of website sessions, orders and find the percentage of successful orders from active sessions.
+- Table: utm_content | sessions (count) | orders (count) | conversion_rate
+
+```sql
+SELECT 
+	utm_source, utm_campaign, http_referer, 
+  COUNT(website_session_id) AS total_sessions
+FROM website_sessions
+WHERE created_at < '2012-04-12'
+GROUP BY utm_source, utm_campaign, http_referer
+ORDER BY total_sessions DESC;
+```
+
+<img width="424" alt="image" src="https://user-images.githubusercontent.com/81607668/139542889-0aaaf833-d4fe-4013-add5-e2eb65090a27.png">
+
+Insight: Learn more about `gsearch` `nonbrand` campaign to explore potential optimization opportunities and scale on it.
+
+## What is the conversion rate for `gsearch` `nonbrand` campaign?
+
+We want to know from the total web sessions for `gsearch` `nonbrand` campaign, how many turned out to be successful orders and converted to sales?
+- ST Request: If CVR >= 4%, then campaign is effective. Otherwise, bid down or reduce the paid marketing cost.
+- Filter to sessions < 2012-04-12, utm_source = gsearch, and utm_campaign = nonbrand
+- Table: sessions (count) | orders (count) | conversion rate
+
+```sql
+SELECT 
+	COUNT(DISTINCT wb.website_session_id) AS sessions,
+	COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/
+    COUNT(DISTINCT wb.website_session_id),2) AS session_to_order_cvr
+FROM mavenfuzzyfactory.website_sessions wb
+LEFT JOIN mavenfuzzyfactory.orders o
+	ON wb.website_session_id = o.website_session_id
+WHERE wb.created_at < '2012-04-12'
+	AND wb.utm_source = 'gsearch'
+  AND wb.utm_campaign = 'nonbrand';
+```
+
+<img width="220" alt="image" src="https://user-images.githubusercontent.com/81607668/139543484-4c50ff9c-7302-4189-897c-9760872f2811.png">
+
+Insights: Conversion rate is less than 4%, hence overspending on gsearch nonbrand campaign. Analysis has saved company's money.
+
+Next steps: Monitor impact of bid reduction for the campaign.
 
