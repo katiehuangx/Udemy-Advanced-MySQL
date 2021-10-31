@@ -1,27 +1,44 @@
 # 📊 Udemy Advanced SQL: MySQL Data Analysis & Business Intelligence
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Analyzing Traffic Sources](#analyzing-traffic-sources)
+- [Analyzing Website Performance](#analyzing-website-performance)
+- [Mid-Course Project](#mid-course-project)
+- [Analysis for Channel Portfolio Management](#analysis-for-channel-portfolio-management)
+- [Analyzing Business Patterns and Seasonality](#analyzing-business-patterns-and-seasonality)
+- [Product Analysis](#product-analysis)
+- [User Analysis](#user-analysis)
+- [Final Project](#final-project)
+
+***
+
 ## Introduction
 
-**The Situation** 
+**👩🏻‍💼 The Situation** 
 
 You’ve just been hired as an eCommerce Database Analyst for Maven Fuzzy Factory, an online retailer which has just launched their first product.
 
-**The Brief**
+**📈 The Brief**
 
 As a member of the startup team, you will work with the CEO, the Head of Marketing, and the Website Manager to help steer the business. 
 
 You will analyze and optimize marketing channels, measure and test website conversion performance, and use data to understand the impact of new product launches.
 
-**The Objective**
+**✏️ The Objective**
 
 Use SQL to:
 - Access and explore the Maven Fuzzy Factory database
 - Become the data expert for the company, and the go-to person for mission critical analyses
 - Analyze and optimize the business’ marketing channels, website, and product portfolio
 
+***
+
 ## Entity Relationship Diagram
 
-<kbd><img width="886" alt="image" src="https://user-images.githubusercontent.com/81607668/139528817-09766746-e26b-4aa6-9465-bd5cc58a34cc.png"></kbd>
+<kbd><img src="https://user-images.githubusercontent.com/81607668/139528817-09766746-e26b-4aa6-9465-bd5cc58a34cc.png" alt="Image" width="750" height="480"></kbd>
 
 <details>
 <summary>
@@ -56,7 +73,7 @@ Click here to expand tables!
  
 ***
 
-# Analyzing Traffic Sources
+## Analyzing Traffic Sources
 
 Traffic Source Analysis
 - Understanding where the customers are coming from and which channels are driving the highest quality traffic. 
@@ -68,7 +85,7 @@ Why is it important to conduct Conversion Rate Analysis?
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
 
-## What is the conversion rate of successful orders?
+### 📌 What is the conversion rate of successful orders?
 
 - ST request: We want to know which traffic source is generating website sessions and driving the orders.
 - Get distinct website session ids and count the total of website sessions, orders and find the percentage of successful orders from active sessions.
@@ -90,7 +107,7 @@ ORDER BY total_sessions DESC;
 
 Insight: Learn more about `gsearch` `nonbrand` campaign to explore potential optimization opportunities and scale on it.
 
-## What is the conversion rate for `gsearch` `nonbrand` campaign?
+### 📌 What is the conversion rate for `gsearch` `nonbrand` campaign?
 
 We want to know from the total web sessions for `gsearch` `nonbrand` campaign, how many turned out to be successful orders and converted to sales?
 - ST Request: If CVR >= 4%, then campaign is effective. Otherwise, bid down or reduce the paid marketing cost.
@@ -117,4 +134,89 @@ Insights: Conversion rate is less than 4%, hence overspending on gsearch nonbran
 
 Next steps: Monitor impact of bid reduction for the campaign.
 
- 
+***
+
+## Analyse Bid Optimization
+
+Analysing for bid optimization is understanding the value of various segments of paid traffic to optimize marketing budget.
+- Our job is to figure out the right amount of bid for various segments of traffic based on our potential revenue. 
+- How do we do that?
+  - Use conversion rate and revenue per click to figure out how much you should spend per click to acquire customers. 
+  - Understand how website and products are performing for subsegments of traffic to optimise within channels. 
+  - Analyse impact of bid changes have on ranking 
+
+### 📌 After bidding down on Apr 15, 2021, what is the trend and impact on sessions for `gsearch` `nonbrand` campaign?
+- ST request: Find the weekly sessions before 2012-05-10. _I'm going a step forward and providing the conversion rate as well in anticipation that ST will ask for this information._
+- Filter to < 2012-05-10, utm_source = gsearch, utm_campaign = nonbrand
+- Table: week_start | session (count) | orders (count) | conversion_rate
+
+```sql
+SELECT
+  MIN(DATE(wb.created_at)) AS week_start,
+	COUNT(DISTINCT wb.website_session_id) AS sessions,
+	COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/
+    COUNT(DISTINCT wb.website_session_id),2) AS conversion_rate
+FROM website_sessions wb
+LEFT JOIN orders o
+	ON wb.website_session_id = o.website_session_id
+WHERE wb.created_at < '2012-05-10'
+	AND wb.utm_source = 'gsearch'
+  AND wb.utm_campaign = 'nonbrand'
+GROUP BY WEEK(wb.created_at);
+```
+
+<img width="275" alt="image" src="https://user-images.githubusercontent.com/81607668/139573298-51e1fb02-1a8c-4746-ba67-925a2405853a.png">
+
+Insight: The sessions and conversion rate after 2021-04-15 has dropped - the campaign is highly sensitive to bid changes. 
+
+Next steps: Continue to monitor session volume. Want to make campaigns more efficient by maximising volume at the lowest possible bid.
+
+### 📌 What is the conversion rate from session to order by device type?
+- Table: device_type | sessions (count) | orders (count) | conversion_rate
+
+```sql
+SELECT
+  wb.device_type,
+	COUNT(DISTINCT wb.website_session_id) AS sessions,
+	COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/
+    COUNT(DISTINCT wb.website_session_id),2) AS conversion_rate
+FROM website_sessions wb
+LEFT JOIN orders o
+	ON wb.website_session_id = o.website_session_id
+WHERE wb.created_at < '2012-05-10'
+	AND wb.utm_source = 'gsearch'
+  AND wb.utm_campaign = 'nonbrand'
+GROUP BY wb.device_type;
+```
+
+<img width="260" alt="image" src="https://user-images.githubusercontent.com/81607668/139573682-d2ab9eb0-1cd7-457a-884f-bd58ccf1c738.png">
+
+Insight: Desktop bids were driving nearly 4% session to successful orders rate, so we should reduce mobile bids and transfer the paid traffic to desktop channel instead.
+
+### 📌 After bidding up on desktop channel on 2012-05-19, what is the weekly session trend for both desktop and mobile?
+- Filter to between 2012-04-15 to 2012-06-19, utm_source = gsearch, utm_campaign = nonbrand
+- Table: week_start_date | desktop_sessions | mobile_sessions
+
+```sql
+SELECT
+  MIN(DATE(created_at)) AS week_start_date,
+  COUNT(DISTINCT CASE WHEN device_type = 'desktop' THEN website_session_id ELSE NULL END) AS desktop_sessions,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) AS mobile_sessions
+FROM website_sessions
+WHERE created_at BETWEEN '2012-04-15' AND '2012-06-09'
+	AND utm_source = 'gsearch'
+  AND utm_campaign = 'nonbrand'
+GROUP BY WEEK(created_at);
+```
+
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/139574114-532ab3a1-457b-4559-9130-6df7c237b932.png">
+
+Insight: After biding up desktop channel on 2012-05-19, there were obvious increase in desktop volume whereas mobile volume has also dropped considerably. ST made the right decision to focus on desktop and able to optimize spend efficiently.
+
+***
+
+## Analyzing Website Performances
+
+
