@@ -93,14 +93,17 @@ Why is it important to conduct Conversion Rate Analysis?
 
 ```sql
 SELECT 
-	utm_source, 
-	utm_campaign, 
-	http_referer, 
-	COUNT(website_session_id) AS total_sessions
+  utm_source, 
+  utm_campaign, 
+  http_referer,
+  COUNT(website_session_id) AS total_sessions
 FROM website_sessions
 WHERE created_at < '2012-04-12'
-GROUP BY utm_source, utm_campaign, http_referer
-ORDER BY total_sessions DESC;
+GROUP BY 
+	utm_source, 
+  utm_campaign, 
+  http_referer
+ORDER BY total_sessions DESC;	
 ```
 
 <img width="424" alt="image" src="https://user-images.githubusercontent.com/81607668/139542889-0aaaf833-d4fe-4013-add5-e2eb65090a27.png">
