@@ -222,4 +222,58 @@ Insight: After biding up desktop channel on 2012-05-19, there were obvious incre
 
 ## Analyzing Website Performances
 
+Website content analysis is about understanding which pages are seen most by the users and to identify where to focus on improving your business.
+- Identify the most common landing page and the first thing a user sees.
+- For most viewed pages and common landing pages, understand how those pages perform for business objectives.
+- Does the pages tell a story or resonate with business values?
 
+### Identify most viewed website pages ranked by session volume
+- Filter date < 2012-06-09
+- Table: pageview_url | sessions (count)
+
+```sql
+SELECT 
+  pageview_url, 
+  COUNT(DISTINCT website_pageview_id) AS page_views
+FROM website_pageviews
+WHERE created_at < '2012-06-09'
+GROUP BY pageview_url
+ORDER BY page_views DESC;
+```
+
+<img width="216" alt="image" src="https://user-images.githubusercontent.com/81607668/139636941-dfca8add-4466-454a-8d76-3c5e9139bded.png">
+
+- Insight: Most viewed pages with highest traffic are homepage, products, and original Mr Fuzzy.
+- Next steps: Is traffic for top landing pages the same?
+
+### Finding top entry/landing pages
+
+Entry/landing page is the page where customer lands on website for the first time.
+- Filter date to < 2012-06-12
+- Table: landing_page_url | landing_page (count)
+
+```sql
+WITH landing_page_cte AS (
+SELECT 
+  website_session_id,
+  MIN(website_pageview_id) AS landing_page -- Find the first page landed for each session
+FROM website_pageviews
+WHERE created_at < '2012-06-12'
+GROUP BY website_session_id
+)
+
+SELECT 
+  wp.pageview_url AS landing_page_url,
+  COUNT(DISTINCT lp.website_session_id) AS count
+FROM landing_page_cte lp
+LEFT JOIN website_pageviews wp
+  ON lp.landing_page = wp.website_pageview_id
+GROUP BY wp.pageview_url
+ORDER BY landing_page_url DESC;
+```
+
+<img width="153" alt="image" src="https://user-images.githubusercontent.com/81607668/139637250-f60c1773-59e3-4708-9eae-3c9cd0b795fc.png">
+
+- Insight: Home page is the top landing page.
+- Next steps: What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
+- Possible metrics: Repeat sessions? Which day and time most viewed? By source, campaign, device type?
