@@ -277,3 +277,4 @@ ORDER BY landing_page_url DESC;
 - Insight: Home page is the top landing page.
 - Next steps: What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - Possible metrics: Repeat sessions? Which day and time most viewed? By source, campaign, device type?
+
