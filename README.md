@@ -227,7 +227,7 @@ Website content analysis is about understanding which pages are seen most by the
 - For most viewed pages and common landing pages, understand how those pages perform for business objectives.
 - Does the pages tell a story or resonate with business values?
 
-### Identify most viewed website pages ranked by session volume
+### 📌 Identify most viewed website pages ranked by session volume
 - Filter date < 2012-06-09
 - Table: pageview_url | sessions (count)
 
@@ -246,7 +246,7 @@ ORDER BY page_views DESC;
 - Insight: Most viewed pages with highest traffic are homepage, products, and original Mr Fuzzy.
 - Next steps: Is traffic for top landing pages the same?
 
-### Finding top entry/landing pages
+### 📌 Finding top entry/landing pages
 
 Entry/landing page is the page where customer lands on website for the first time.
 - Filter date to < 2012-06-12
@@ -278,7 +278,7 @@ ORDER BY landing_page_url DESC;
 - Next steps: What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - Possible metrics: Repeat sessions? Which day and time most viewed? By source, campaign, device type?
 
-### Analzying bounce rate for landing pages
+### 📌 Analzying bounce rate for landing pages
 
 Now that we have the sessions for the landing pages, let's find out their bounce rate.
 
@@ -333,7 +333,7 @@ Insight: `/lander-3` has highest bounce rate followed by `/lander-3` and `/home`
 
 Next steps: To further investigate why `/lander-3` has > 50% bounce rate. 
 
-### Calculating bounce rate for homepage
+### 📌 Calculating bounce rate for homepage
 
 As home page is the first page that users most commonly see on the website, ST is interested to know what's the bounce rate.
 
@@ -386,7 +386,7 @@ GROUP BY lp.landing_page;
 
 Insight: 60% bounce rate is pretty high especially for paid search.
 
-### Analyzing landing page tests
+### 📌 Analyzing landing page tests
 
 ST is running a A/B test on `\lander-1` and `\home` for `gsearch nonbrand` campaign and would like to find out the bounce rates for both pages.
 - Criteria: Limit time period to when `\lander-1` started receiving traffic and limit results to < 2012-07-28 to ensure fair comparison.
