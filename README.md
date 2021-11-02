@@ -5,7 +5,7 @@
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Analyzing Traffic Sources](#analyzing-traffic-sources)
-- [Analyzing Website Performance](#analyzing-website-performance)
+- [Analyzing Website Performances](#analyzing-website-performances)
 - [Mid-Course Project](#mid-course-project)
 - [Analysis for Channel Portfolio Management](#analysis-for-channel-portfolio-management)
 - [Analyzing Business Patterns and Seasonality](#analyzing-business-patterns-and-seasonality)
