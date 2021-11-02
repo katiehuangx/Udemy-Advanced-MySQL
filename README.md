@@ -356,7 +356,7 @@ INNER JOIN website_sessions s
 WHERE p.pageview_url = '/home' 
 GROUP BY p.website_session_id
 ),
--- 2 Bounced sessions only
+- Step 2: Count page views for each session to identify bounces
 bounced_views_cte AS (
 SELECT 
   lp.website_session_id,
@@ -370,7 +370,7 @@ GROUP BY
   lp.landing_page
 HAVING COUNT(p.website_pageview_id) = 1
 )
--- 3. Find number of sessions and bounced sessions by landing page
+- Step 3: Summarize total sessions and bounced sessions
 SELECT 
   COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
   COUNT(DISTINCT b.website_session_id) AS bounced_sessions, -- number of bounced sessions by landing page
