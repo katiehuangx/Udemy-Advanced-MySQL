@@ -278,3 +278,177 @@ ORDER BY landing_page_url DESC;
 - Next steps: What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - Possible metrics: Repeat sessions? Which day and time most viewed? By source, campaign, device type?
 
+### Analzying bounce rate for landing pages
+
+Now that we have the sessions for the landing pages, let's find out their bounce rate.
+
+We breakdown the steps to get a clear picture of what we're trying to find.
+- Table: landing page | sessions (count) | bounced sessions (count) | bounced rate
+- Step 1: Find the first `website_pageview_id` or landing page for associated session
+- Step 2: Count page views for each session to identify bounces
+- Step 3: Summarize total sessions and bounced sessions and calculate bounce rate
+
+```sql
+-- Step 1: Find the first `website_pageview_id` or landing page for associated session
+WITH landing_page_cte AS (
+SELECT 
+  p.website_session_id,
+  MIN(p.website_pageview_id) AS first_landing_page_id,
+  p.pageview_url AS landing_page -- page view of first landing page
+FROM website_pageviews p
+INNER JOIN website_sessions s
+  ON p.website_session_id = s.website_session_id
+  AND s.created_at BETWEEN '2014-01-01' AND '2014-02-01'
+GROUP BY p.website_session_id
+),
+-- Step 2: Count page views for each session to identify bounces
+bounced_views_cte AS (
+SELECT 
+  lp.website_session_id,
+  lp.landing_page, 
+  COUNT(p.website_pageview_id) AS bounced_views
+FROM landing_page_cte lp
+LEFT JOIN website_pageviews p
+  ON lp.website_session_id = p.website_session_id
+GROUP BY 
+  lp.website_session_id,
+  lp.landing_page
+HAVING COUNT(p.website_pageview_id) = 1
+)
+- Step 3: Summarize total sessions and bounced sessions and calculate bounce rate
+SELECT 
+  COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
+  COUNT(DISTINCT b.website_session_id) AS bounced_sessions, -- number of bounced sessions by landing page
+  ROUND(100 * COUNT(DISTINCT b.website_session_id)/
+    COUNT(DISTINCT lp.website_session_id),2) AS bounce_rate
+FROM landing_page_cte lp -- use left join to preserve all sessions with 1 home page view
+LEFT JOIN bounced_views_cte b
+  ON lp.website_session_id = b.website_session_id
+GROUP BY lp.landing_page;
+```
+
+<img width="315" alt="image" src="https://user-images.githubusercontent.com/81607668/139800515-7b0938c8-c6d1-4411-b31a-b8dfecb78643.png">
+
+Insight: `/lander-3` has highest bounce rate followed by `/lander-3` and `/home`. 
+
+Next steps: To further investigate why `/lander-3` has > 50% bounce rate. 
+
+### Calculating bounce rate for homepage
+
+As home page is the first page that users most commonly see on the website, ST is interested to know what's the bounce rate.
+
+- Table: sessions | bounced sessions | bounce rate 
+- Step 1: Find first website_pageview_id/landing page for associated session and filter to date < 2012-06-14 and `/home`
+- Step 2: Count page views for each session to identify bounces
+- Step 3: Summarize total sessions and bounced sessions
+
+```sql
+-- Step 1: Find first website_pageview_id/landing page for associated session and filter to date < 2012-06-14 and '\home'
+WITH landing_page_cte AS (
+SELECT 
+  p.website_session_id,
+  MIN(p.website_pageview_id) AS first_landing_page_id,
+  p.pageview_url AS landing_page -- page view of first landing page
+FROM website_pageviews p
+INNER JOIN website_sessions s
+  ON p.website_session_id = s.website_session_id
+  AND s.created_at < '2012-06-14'
+WHERE p.pageview_url = '/home' 
+GROUP BY p.website_session_id
+),
+-- 2 Bounced sessions only
+bounced_views_cte AS (
+SELECT 
+  lp.website_session_id,
+  lp.landing_page, 
+  COUNT(p.website_pageview_id) AS bounced_views
+FROM landing_page_cte lp
+LEFT JOIN website_pageviews p
+  ON lp.website_session_id = p.website_session_id
+GROUP BY 
+  lp.website_session_id,
+  lp.landing_page
+HAVING COUNT(p.website_pageview_id) = 1
+)
+-- 3. Find number of sessions and bounced sessions by landing page
+SELECT 
+  COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
+  COUNT(DISTINCT b.website_session_id) AS bounced_sessions, -- number of bounced sessions by landing page
+  ROUND(100 * COUNT(DISTINCT b.website_session_id)/
+    COUNT(DISTINCT lp.website_session_id),2) AS bounce_rate
+FROM landing_page_cte lp -- use left join to preserve all sessions with 1 home page view
+LEFT JOIN bounced_views_cte b
+  ON lp.website_session_id = b.website_session_id
+GROUP BY lp.landing_page;
+```
+
+<img width="268" alt="image" src="https://user-images.githubusercontent.com/81607668/139804071-9f7b4dc3-4bed-46e0-bc59-89b90b3b9747.png">
+
+Insight: 60% bounce rate is pretty high especially for paid search.
+
+### Analyzing landing page tests
+
+ST is running a A/B test on `\lander-1` and `\home` for `gsearch nonbrand` campaign and would like to find out the bounce rates for both pages.
+- Criteria: Limit time period to when `\lander-1` started receiving traffic and limit results to < 2012-07-28 to ensure fair comparison.
+- Table: landing_page | total sessions | bounced sessions | bounce rate
+- Step 1: Find when `/lander-1` was created and first displayed to user on the website. Use either date or pageview id to limit the results.
+- Step 2: Find first landing page and filter to test time period (after '2012-06-19') and as prescribed by ST (before '2012-07-28') for gsearch and nonbrand campaign.
+- Step 3: Count page views for each session to identify bounces
+- Step 4: Summarize total sessions and bounced sessions and calculate bounce rate
+
+```sql
+-- Step 1: Find when `/lander-1` was created and first displayed to user on the website
+SELECT 
+  MIN(created_at) AS lander1_created_at,
+  MIN(website_pageview_id) AS lander1_website_pageview_id
+FROM website_pageviews
+WHERE pageview_url = '/lander-1';
+
+-- Step 2: Find first landing page and filter to test time period '2012-06-19' to '2012-07-28' for gsearch and nonbrand campaign
+WITH landing_page_cte AS (
+SELECT 
+  p.website_session_id,
+  MIN(p.website_pageview_id) AS landing_page_id,
+  p.pageview_url AS landing_page -- page view of first landing page
+FROM website_pageviews p
+INNER JOIN website_sessions s
+  ON p.website_session_id = s.website_session_id
+  AND s.created_at BETWEEN '2012-06-19' AND '2012-07-28' -- A/B test time period as prescribed
+  AND utm_source = 'gsearch'
+  AND utm_campaign = 'nonbrand'
+  AND p.pageview_url IN ('/home','/lander-1') -- A/B test on both pages
+GROUP BY p.website_session_id, p.pageview_url
+),
+-- Step 3: Count page views for each session to identify bounces
+bounced_views_cte AS (
+SELECT 
+  lp.website_session_id,
+  COUNT(p.website_pageview_id) AS bounced_views
+FROM landing_page_cte lp
+LEFT JOIN website_pageviews p
+  ON lp.website_session_id = p.website_session_id -- join where session id with first landing page
+GROUP BY lp.website_session_id
+HAVING COUNT(p.website_pageview_id) = 1 -- Filter for page views = 1 view = bounced view
+)
+-- Step 4: Summarize total sessions and bounced sessions and calculate bounce rate
+SELECT 
+  landing_page,
+  COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
+  COUNT(DISTINCT b.website_session_id) AS bounced_sessions, -- number of bounced sessions by landing page
+  ROUND(100 * COUNT(DISTINCT b.website_session_id)/
+    COUNT(DISTINCT lp.website_session_id),2) AS bounce_rate
+FROM landing_page_cte lp -- use left join to preserve all sessions with 1 page view
+LEFT JOIN bounced_views_cte b
+  ON lp.website_session_id = b.website_session_id
+GROUP BY lp.landing_page;
+```
+
+<img width="343" alt="image" src="https://user-images.githubusercontent.com/81607668/139808742-1f307189-6633-4765-baf2-57969405f8cd.png">
+
+Insight: Looks like the newly created `/lander-1`'s traffic has improved and bounce rate has reduced too, meaning fewer customers has bounced on the page.  
+
+Next steps: Ensure that all new campaigns are directed to the new lander-1 page and monitor the bounce rates.
+
+
+
+
