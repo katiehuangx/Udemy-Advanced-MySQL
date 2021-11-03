@@ -117,7 +117,7 @@ We want to know from the total web sessions for `gsearch` `nonbrand` campaign, h
 ```sql
 SELECT 
   COUNT(DISTINCT wb.website_session_id) AS sessions,
-  COUNT(DISTINCT o.order_id) AS orders,
+	COUNT(DISTINCT o.order_id) AS orders,
   ROUND(100 * COUNT(DISTINCT o.order_id)/
     COUNT(DISTINCT wb.website_session_id),2) AS session_to_order_cvr
 FROM website_sessions wb
@@ -185,7 +185,7 @@ SELECT
 FROM website_sessions wb
 LEFT JOIN orders o
 	ON wb.website_session_id = o.website_session_id
-WHERE wb.created_at < '2012-05-10'
+WHERE wb.created_at < '2012-05-11'
 	AND wb.utm_source = 'gsearch'
   AND wb.utm_campaign = 'nonbrand'
 GROUP BY wb.device_type;
@@ -229,8 +229,8 @@ Website content analysis is about understanding which pages are seen most by the
 - Table: pageview_url | sessions (count)
 
 ```sql
-SELECT
-  pageview_url,
+SELECT 
+  pageview_url, 
   COUNT(DISTINCT website_pageview_id) AS page_views
 FROM website_pageviews
 WHERE created_at < '2012-06-09'
