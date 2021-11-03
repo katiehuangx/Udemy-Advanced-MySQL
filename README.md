@@ -5,9 +5,15 @@
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Analyzing Traffic Sources](#analyzing-traffic-sources)
+  - Analyzing top traffic source
+  - Bid optimization and trend analysis
 - [Analyzing Website Performances](#analyzing-website-performances)
+  - Analyzing top website pages and entry/landing pages
+  - Analyzing bounce rates and landing pages test
+  - Building conversion funnels and testing conversion paths
 - [Mid-Course Project](#mid-course-project)
 - [Analysis for Channel Portfolio Management](#analysis-for-channel-portfolio-management)
+  - Analyzing channel portfolios
 - [Analyzing Business Patterns and Seasonality](#analyzing-business-patterns-and-seasonality)
 - [Product Analysis](#product-analysis)
 - [User Analysis](#user-analysis)
@@ -85,6 +91,10 @@ Why is it important to conduct Conversion Rate Analysis?
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
 
+In this section, we will learn about
+- Analyzing top traffic source
+- Bid optimization and trend analysis
+
 ### 📌 Q21: What is the conversion rate of successful orders?
 
 - ST request: We want to know which traffic source is generating website sessions and driving the orders.
@@ -134,9 +144,7 @@ Insights: Conversion rate is less than 4%, hence overspending on gsearch nonbran
 
 Next steps: Monitor impact of bid reduction for the campaign.
 
-***
-
-## Analyse Bid Optimization
+### Analyse Bid Optimization
 
 Analysing for bid optimization is understanding the value of various segments of paid traffic to optimize marketing budget.
 - Our job is to figure out the right amount of bid for various segments of traffic based on our potential revenue. 
@@ -224,7 +232,13 @@ Website content analysis is about understanding which pages are seen most by the
 - For most viewed pages and common landing pages, understand how those pages perform for business objectives.
 - Does the pages tell a story or resonate with business values?
 
+In this section, we will learn about
+- Analyzing top website pages and entry/landing pages
+- Analyzing bounce rates and landing pages test
+- Building conversion funnels and testing conversion paths
+
 ### 📌 Q34: Identify most viewed website pages ranked by session volume
+
 - Filter date < 2012-06-09
 - Table: pageview_url | sessions (count)
 
@@ -312,7 +326,7 @@ GROUP BY
   lp.landing_page
 HAVING COUNT(p.website_pageview_id) = 1
 )
-- Step 3: Summarize total sessions and bounced sessions and calculate bounce rate
+-- Step 3: Summarize total sessions and bounced sessions and calculate bounce rate
 SELECT 
   COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
   COUNT(DISTINCT b.website_session_id) AS bounced_sessions, -- number of bounced sessions by landing page
