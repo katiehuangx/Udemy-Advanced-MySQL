@@ -117,7 +117,7 @@ We want to know from the total web sessions for `gsearch` `nonbrand` campaign, h
 ```sql
 SELECT 
   COUNT(DISTINCT wb.website_session_id) AS sessions,
-	COUNT(DISTINCT o.order_id) AS orders,
+  COUNT(DISTINCT o.order_id) AS orders,
   ROUND(100 * COUNT(DISTINCT o.order_id)/
     COUNT(DISTINCT wb.website_session_id),2) AS session_to_order_cvr
 FROM website_sessions wb
@@ -229,8 +229,8 @@ Website content analysis is about understanding which pages are seen most by the
 - Table: pageview_url | sessions (count)
 
 ```sql
-SELECT 
-  pageview_url, 
+SELECT
+  pageview_url,
   COUNT(DISTINCT website_pageview_id) AS page_views
 FROM website_pageviews
 WHERE created_at < '2012-06-09'
@@ -251,7 +251,7 @@ Entry/landing page is the page where customer lands on website for the first tim
 
 ```sql
 WITH landing_page_cte AS (
-SELECT 
+SELECT
   website_session_id,
   MIN(website_pageview_id) AS landing_page -- Find the first page landed for each session
 FROM website_pageviews
