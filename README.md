@@ -1,26 +1,5 @@
 # 📊 Udemy Advanced SQL: MySQL Data Analysis & Business Intelligence
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Entity Relationship Diagram](#entity-relationship-diagram)
-- [Analyzing Traffic Sources](#analyzing-traffic-sources)
-  - Analyzing top traffic source
-  - Bid optimization and trend analysis
-- [Analyzing Website Performances](#analyzing-website-performances)
-  - Analyzing top website pages and entry/landing pages
-  - Analyzing bounce rates and landing pages test
-  - Building conversion funnels and testing conversion paths
-- [Mid-Course Project](#mid-course-project)
-- [Analysis for Channel Portfolio Management](#analysis-for-channel-portfolio-management)
-  - Analyzing channel portfolios
-- [Analyzing Business Patterns and Seasonality](#analyzing-business-patterns-and-seasonality)
-- [Product Analysis](#product-analysis)
-- [User Analysis](#user-analysis)
-- [Final Project](#final-project)
-
-***
-
 ## Introduction
 
 **👩🏻‍💼 THE SITUATION** 
@@ -41,6 +20,18 @@ Use SQL to:
 - Analyze and optimize the business’ marketing channels, website, and product portfolio
 
 ***
+
+## Table of Contents
+
+- [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Analyzing Traffic Sources](#analyzing-traffic-sources)
+- [Analyzing Website Performances](#analyzing-website-performances)
+- [Mid-Course Project](#mid-course-project)
+- [Analysis for Channel Portfolio Management](#analysis-for-channel-portfolio-management)
+- [Analyzing Business Patterns and Seasonality](#analyzing-business-patterns-and-seasonality)
+- [Product Analysis](#product-analysis)
+- [User Analysis](#user-analysis)
+- [Final Project](#final-project)
 
 ## Entity Relationship Diagram
 
