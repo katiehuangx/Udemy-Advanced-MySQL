@@ -386,7 +386,7 @@ GROUP BY lp.landing_page;
 
 Insight: 60% bounce rate is pretty high especially for paid search.
 
-### 📌 Analyzing landing page tests
+### 📌 Analyzing Landing Page Tests
 
 ST is running a A/B test on `\lander-1` and `\home` for `gsearch nonbrand` campaign and would like to find out the bounce rates for both pages.
 - Criteria: Limit time period to when `\lander-1` started receiving traffic and limit results to < 2012-07-28 to ensure fair comparison.
@@ -449,6 +449,54 @@ Insight: Looks like the newly created `/lander-1`'s traffic has improved and bou
 
 Next steps: Ensure that all new campaigns are directed to the new lander-1 page and monitor the bounce rates.
 
+### 📌 Landing Page Trend Analysis
 
+ST is requesting us to pull paid gsearch nonbrand campaign traffic on `/home` and `/lander-1` pages, trended weekly since 2012-06-01 and the bounce rates.
+- Criteria: Email received on 31 Aug 2021, so limit results between 2012-06-01 to 2012-08-31
+- Table: landing page | week start dates | sessions (count) | bounced sessions (count) | bounce rate | 
 
+-- Step 1: Find first website_pageview_id for first landing page id
+-- Step 2: Identify landing page of each session
+-- Step 3: Count page views for each session to identify bounces
+-- Step 4: Summarize sessions, bounced sessions and bounce rate by week 
+
+-- Step 1: Find first website_pageview_id/landing page and no of page views
+WITH landing_pages_cte AS (
+SELECT 
+  s.website_session_id,
+  MIN(p.website_pageview_id) AS first_pageview_id, -- first page view id
+  COUNT(p.website_pageview_id) AS pageview_count -- no of total view counts per session
+FROM website_sessions s 
+INNER JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+WHERE s.created_at BETWEEN '2012-06-01' AND '2012-08-31'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+GROUP BY s.website_session_id
+),
+summary_cte AS (
+SELECT
+  lp.website_session_id,
+  lp.first_pageview_id,
+  lp.pageview_count,
+  p.pageview_url AS landing_page, -- add new field
+  p.created_at -- add new field
+FROM landing_pages_cte lp
+INNER JOIN website_pageviews p
+  ON lp.first_pageview_id = p.website_pageview_id
+)
+SELECT
+  YEARWEEK(created_at) AS year_week,
+  MIN(DATE(created_at)) AS week_start, -- 1st day of associated week
+  COUNT(DISTINCT website_session_id) AS total_sessions,
+  COUNT(DISTINCT CASE WHEN pageview_count = 1 THEN website_session_id END) AS bounced_sessions,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN pageview_count = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS bounce_rate,
+  COUNT(DISTINCT CASE WHEN landing_page = '/home' THEN website_session_id ELSE NULL END) AS home_sessions,
+  COUNT(DISTINCT CASE WHEN landing_page = '/lander-1' THEN website_session_id ELSE NULL END) AS lander_sessions
+FROM summary_cte s
+GROUP BY WEEK(created_at);
+
+-- Before 2012-06-17, all traffic were routed to home, then after 2012-08-05 all traffic routed to lander.
+-- bounce rate drop from 60+% to 50% so there is improvement. Changes to lander1 page is working well.
 
