@@ -17,17 +17,17 @@
 
 ## Introduction
 
-**👩🏻‍💼 The Situation** 
+**👩🏻‍💼 THE SITUATION** 
 
 You’ve just been hired as an eCommerce Database Analyst for Maven Fuzzy Factory, an online retailer which has just launched their first product.
 
-**📈 The Brief**
+**📈 THE BRIEF**
 
 As a member of the startup team, you will work with the CEO, the Head of Marketing, and the Website Manager to help steer the business. 
 
 You will analyze and optimize marketing channels, measure and test website conversion performance, and use data to understand the impact of new product launches.
 
-**✏️ The Objective**
+**✏️ THE OBJECTIVE**
 
 Use SQL to:
 - Access and explore the Maven Fuzzy Factory database
@@ -85,7 +85,7 @@ Why is it important to conduct Conversion Rate Analysis?
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
 
-### 📌 What is the conversion rate of successful orders?
+### 📌 Q21: What is the conversion rate of successful orders?
 
 - ST request: We want to know which traffic source is generating website sessions and driving the orders.
 - Get distinct website session ids and count the total of website sessions, orders and find the percentage of successful orders from active sessions.
@@ -110,7 +110,7 @@ ORDER BY total_sessions DESC;
 
 Insight: Learn more about `gsearch` `nonbrand` campaign to explore potential optimization opportunities and scale on it.
 
-### 📌 What is the conversion rate for `gsearch` `nonbrand` campaign?
+### 📌 Q23: What is the conversion rate for `gsearch` `nonbrand` campaign?
 
 We want to know from the total web sessions for `gsearch` `nonbrand` campaign, how many turned out to be successful orders and converted to sales?
 - ST Request: If CVR >= 4%, then campaign is effective. Otherwise, bid down or reduce the paid marketing cost.
@@ -148,7 +148,7 @@ Analysing for bid optimization is understanding the value of various segments of
   - Understand how website and products are performing for subsegments of traffic to optimise within channels. 
   - Analyse impact of bid changes have on ranking 
 
-### 📌 After bidding down on Apr 15, 2021, what is the trend and impact on sessions for `gsearch` `nonbrand` campaign?
+### 📌 Q26: After bidding down on Apr 15, 2021, what is the trend and impact on sessions for `gsearch` `nonbrand` campaign?
 - ST request: Find the weekly sessions before 2012-05-10. _I'm going a step forward and providing the conversion rate as well in anticipation that ST will ask for this information._
 - Filter to < 2012-05-10, utm_source = gsearch, utm_campaign = nonbrand
 - Table: week_start | session (count) | orders (count) | conversion_rate
@@ -175,7 +175,7 @@ Insight: The sessions and conversion rate after 2021-04-15 has dropped - the cam
 
 Next steps: Continue to monitor session volume. Want to make campaigns more efficient by maximising volume at the lowest possible bid.
 
-### 📌 What is the conversion rate from session to order by device type?
+### 📌 Q28: What is the conversion rate from session to order by device type?
 - Table: device_type | sessions (count) | orders (count) | conversion_rate
 
 ```sql
@@ -198,7 +198,7 @@ GROUP BY wb.device_type;
 
 Insight: Desktop bids were driving nearly 4% session to successful orders rate, so we should reduce mobile bids and transfer the paid traffic to desktop channel instead.
 
-### 📌 After bidding up on desktop channel on 2012-05-19, what is the weekly session trend for both desktop and mobile?
+### 📌 Q30: After bidding up on desktop channel on 2012-05-19, what is the weekly session trend for both desktop and mobile?
 - Filter to between 2012-04-15 to 2012-06-19, utm_source = gsearch, utm_campaign = nonbrand
 - Table: week_start_date | desktop_sessions | mobile_sessions
 
@@ -227,7 +227,7 @@ Website content analysis is about understanding which pages are seen most by the
 - For most viewed pages and common landing pages, understand how those pages perform for business objectives.
 - Does the pages tell a story or resonate with business values?
 
-### 📌 Identify most viewed website pages ranked by session volume
+### 📌 Q34: Identify most viewed website pages ranked by session volume
 - Filter date < 2012-06-09
 - Table: pageview_url | sessions (count)
 
@@ -246,7 +246,7 @@ ORDER BY page_views DESC;
 - Insight: Most viewed pages with highest traffic are homepage, products, and original Mr Fuzzy.
 - Next steps: Is traffic for top landing pages the same?
 
-### 📌 Finding top entry/landing pages
+### 📌 Q36: Finding top entry/landing pages
 
 Entry/landing page is the page where customer lands on website for the first time.
 - Filter date to < 2012-06-12
@@ -278,7 +278,7 @@ ORDER BY landing_page_url DESC;
 - Next steps: What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - Possible metrics: Repeat sessions? Which day and time most viewed? By source, campaign, device type?
 
-### 📌 Analzying bounce rate for landing pages
+### 📌 Q39: Analzying bounce rate for landing pages
 
 Now that we have the sessions for the landing pages, let's find out their bounce rate.
 
@@ -386,7 +386,7 @@ GROUP BY lp.landing_page;
 
 Insight: 60% bounce rate is pretty high especially for paid search.
 
-### 📌 Analyzing Landing Page Tests
+### 📌 Q41: Analyzing Landing Page Tests
 
 ST is running a A/B test on `\lander-1` and `\home` for `gsearch nonbrand` campaign and would like to find out the bounce rates for both pages.
 - Criteria: Limit time period to when `\lander-1` started receiving traffic and limit results to < 2012-07-28 to ensure fair comparison.
@@ -449,7 +449,7 @@ Insight: Looks like the newly created `/lander-1`'s traffic has improved and bou
 
 Next steps: Ensure that all new campaigns are directed to the new lander-1 page and monitor the bounce rates.
 
-### 📌 Landing Page Trend Analysis
+### 📌 Q43: Landing Page Trend Analysis
 
 ST is requesting us to pull paid gsearch nonbrand campaign traffic on `/home` and `/lander-1` pages, trended weekly since 2012-06-01 and the bounce rates.
 - Criteria: Email received on 31 Aug 2021, so limit results between 2012-06-01 to 2012-08-31
@@ -497,6 +497,143 @@ SELECT
 FROM summary_cte s
 GROUP BY WEEK(created_at);
 
--- Before 2012-06-17, all traffic were routed to home, then after 2012-08-05 all traffic routed to lander.
--- bounce rate drop from 60+% to 50% so there is improvement. Changes to lander1 page is working well.
+Insight: Before 2012-06-17, all traffic were routed to home, then after 2012-08-05 all traffic is routed to lander-1. Bounce rate dropped from 60%+ to nearing 50% so there is improvement. Changes made to `/lander-1` page is working well.
+
+### Analyzing and Testing Conversion Funnels
+
+Conversion funnel analysis is about understanding and optimizing each step of user's experience on their journey towards purchasing our products.
+
+Homepage > Product Page > Add to Cart > Sale
+
+- Identify most common paths customers take before purchasing our products.
+- Identify how many of the users continue to the next step in the conversion funnel and how many users abandon at each step.
+- Optimize critical pain points where users are abandoning so that you can convert more users and sell more products.
+
+### Q46: Build a conversion funnel for `gsearch nonbrand` traffic from `/lander-1` to `/thank you` page
+
+- Criteria: Limit results from 2012-08-05 to 2012-09-05
+- Table: sessions | lander1 click % | product click % | mrfuzzy click % | cart click % | shipping click % | billing click % | thank you click %
+- Step 1: Select all pageviews fr relevant session
+- Step 2: Identify each relevant pageview as specific funnel step
+- Step 3: Create session-level conversion funnel view
+- Step 4: Aggregate data to assess funnel performance
+
+```sql
+-- Step 1: Select all pageviews fr relevant session
+WITH pageviews_cte AS (
+SELECT
+  s.website_session_id,
+  p.pageview_url,
+  CASE WHEN p.pageview_url = '/products' THEN 1 ELSE 0 END AS product_page,
+  CASE WHEN p.pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page,
+  CASE WHEN p.pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+  CASE WHEN p.pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+  CASE WHEN p.pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+  CASE WHEN p.pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+FROM website_sessions s
+LEFT JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+WHERE s.created_at BETWEEN '2012-08-05' AND '2012-09-05'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+  AND p.pageview_url IN ('/lander-1', '/products', '/the-original-mr-fuzzy', 
+    '/cart', '/shipping', '/billing', '/thank-you-for-your-order')
+),
+-- Step 2: Identify each relevant pageview as specific funnel step
+-- Step 3: Create session-level conversion funnel view
+session_level_cte AS (
+SELECT
+  website_session_id, 
+  MAX(product_page) AS product_madeit,
+  MAX(mrfuzzy_page) AS mrfuzzy_madeit,
+  MAX(cart_page) AS cart_madeit,
+  MAX(shipping_page) AS shipping_madeit,
+  MAX(billing_page) AS billing_madeit,
+  MAX(thankyou_page) AS thankyou_madeit
+FROM pageviews_cte
+GROUP BY website_session_id
+)
+-- Step 4: Aggregate data to assess funnel performance
+SELECT
+  COUNT(DISTINCT website_session_id) AS sessions,
+  ROUND(100 * COUNT(CASE WHEN product_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS lander_clickrate,
+  ROUND(100 * COUNT(CASE WHEN mrfuzzy_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(CASE WHEN product_madeit = 1 THEN 1 ELSE NULL END),2) AS products_clickrate,
+  ROUND(100 * COUNT(CASE WHEN cart_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(CASE WHEN mrfuzzy_madeit = 1 THEN 1 ELSE NULL END),2) AS mrfuzzy_clickrate,
+  ROUND(100 * COUNT(CASE WHEN shipping_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(CASE WHEN cart_madeit = 1 THEN 1 ELSE NULL END),2) AS cart_clickrate,
+  ROUND(100 * COUNT(CASE WHEN billing_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(CASE WHEN shipping_madeit = 1 THEN 1 ELSE NULL END),2) AS shipping_clickrate,
+  ROUND(100 * COUNT(CASE WHEN thankyou_madeit = 1 THEN 1 ELSE NULL END)/
+    COUNT(CASE WHEN billing_madeit = 1 THEN 1 ELSE NULL END),2) AS billing_clickrate
+FROM session_level_cte;
+```
+
+<img width="649" alt="image" src="https://user-images.githubusercontent.com/81607668/140033057-cb36e058-1f0a-4cf6-921b-b2eb4ad46d1c.png">
+
+Insights: 
+- To focus on /lander-1, mrfuzzy and billing pages with lowest clickthrough rate - why are users dropping off on these pages?
+- More information on billing page will make customers more comfortable to insert their credit card information.
+
+### Q48: Analyze conversion funnel test for `/billing` vs. new `/billing-2` pages
+- ST has developed a new `/billing-2` page and wants to test the traffic and billing to order conversion rate of both pages.
+- table: billing_version | sessions | orders | billing_to_order_rate
+
+```sql
+-- Step 1: Find when /billing-2 was first active
+SELECT 
+  MIN(website_pageview_id)
+FROM website_pageviews
+WHERE pageview_url = '/billing-2';
+-- /billing-2 is first active on website pageview id = 53550
+
+-- Step 2: Select all pageviews for relevant session
+WITH billing_cte AS (
+SELECT 
+  s.website_session_id,
+  p.pageview_url
+FROM website_sessions s
+LEFT JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+WHERE p.website_pageview_id >= 53550 -- first page view when /billing-2 is active
+  AND s.created_at < '2012-11-10'
+  AND p.pageview_url IN ('/billing', '/billing-2')
+)
+-- Step 3: Aggregate and summarise the conversion rate
+SELECT
+  b.pageview_url,
+  COUNT(DISTINCT b.website_session_id) AS sessions,
+  COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/COUNT(DISTINCT b.website_session_id),2) AS session_to_orders_rate
+FROM billing_cte b
+LEFT JOIN orders o
+  ON b.website_session_id = o.website_session_id
+GROUP BY b.pageview_url;
+```
+
+<img width="317" alt="image" src="https://user-images.githubusercontent.com/81607668/140033607-c8f07fcf-a56a-460f-ad8d-4e8a0da2bccb.png">
+
+Insights: `/billing-2` page has session to order converstion rate at 62%; much better than billing page at 46%. To request engineering team to roll out new  `/billing-2` page to customers immediately.
+
+Next step: Monitor overall sales performance.
+
+***
+
+## Mid-Course Project
+
+**THE SITUATION **
+
+Maven Fuzzy Factory has been live for ~8 months, and your CEO is due to present company performance metrics to the board next week. You’ll be the one tasked with preparing relevant metrics to show the company’s promising growth.
+
+**THE OBJECTIVE**
+
+Use SQL to:
+- Extract and analyze website traffic and performance data from the Maven Fuzzy Factory database to quantify the company’s growth, and to tell the story of how you have been able to generate that growth.
+- As an Analyst, the first part of your job is extracting and analyzing the data, and the next part of your job is effectively communicating the story to your stakeholders.
+
+
+
+
 
