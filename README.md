@@ -99,10 +99,7 @@ SELECT
   COUNT(website_session_id) AS total_sessions
 FROM website_sessions
 WHERE created_at < '2012-04-12'
-GROUP BY 
-	utm_source, 
-  utm_campaign, 
-  http_referer
+GROUP BY utm_source, utm_campaign, http_referer
 ORDER BY total_sessions DESC;	
 ```
 
@@ -118,15 +115,15 @@ We want to know from the total web sessions for `gsearch` `nonbrand` campaign, h
 - Table: sessions (count) | orders (count) | conversion rate
 
 ```sql
-SELECT
+SELECT 
   COUNT(DISTINCT wb.website_session_id) AS sessions,
-  COUNT(DISTINCT o.order_id) AS orders,
+	COUNT(DISTINCT o.order_id) AS orders,
   ROUND(100 * COUNT(DISTINCT o.order_id)/
     COUNT(DISTINCT wb.website_session_id),2) AS session_to_order_cvr
-FROM mavenfuzzyfactory.website_sessions wb
-LEFT JOIN mavenfuzzyfactory.orders o
+FROM website_sessions wb
+LEFT JOIN orders o
 	ON wb.website_session_id = o.website_session_id
-WHERE wb.created_at < '2012-04-12'
+WHERE wb.created_at < '2012-04-14'
 	AND wb.utm_source = 'gsearch'
   AND wb.utm_campaign = 'nonbrand';
 ```
