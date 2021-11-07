@@ -640,13 +640,135 @@ Use SQL to:
 
 ### 📌 Q1: Gsearch seems to be the biggest driver of our business. Could you pull monthly trends for gsearch sessions and orders so that we can showcase the growth there?
 
+- Table: year month | sessions | orders | session to order rate
+
+```sql
+SELECT
+  EXTRACT(YEAR_MONTH FROM s.created_at) AS yr_mth,
+  COUNT(DISTINCT s.website_session_id) AS sessions,
+  COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/ 
+    COUNT(DISTINCT s.website_session_id),2) AS conversion_rate
+FROM website_sessions s
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE s.created_at < '2012-11-27'
+  AND s.utm_source = 'gsearch'
+GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
+```
+
+<img width="271" alt="image" src="https://user-images.githubusercontent.com/81607668/140636799-322905ad-5e44-492f-a5ad-009d23253bac.png">
+
+Insights: Steady growth of gsearch session to order rate from 3.27% in Mar 2012 to 4.23% to Nov 2012. 
+
 ### 📌 Q2: Next, it would be great to see a similar monthly trend for Gsearch, but this time splitting out nonbrand and brand campaigns separately. I am wondering if brand is picking up at all. If so, this is a good story to tell.
+
+- Table: year_month | nonbrand_sessions | nonbrand_orders | nonbrand_conversion_r | brand_sessions | brand_orders | brand_conversion_r
+
+```sql
+SELECT 
+  EXTRACT(YEAR_MONTH FROM s.created_at) AS yr_mth,
+  COUNT(DISTINCT CASE WHEN s.utm_campaign = 'nonbrand' THEN s.website_session_id ELSE NULL END) AS nonbrand_sessions,
+  COUNT(DISTINCT CASE WHEN s.utm_campaign = 'nonbrand' THEN o.order_id ELSE NULL END) AS nonbrand_orders,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN s.utm_campaign = 'nonbrand' THEN o.order_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN s.utm_campaign = 'nonbrand' THEN s.website_session_id ELSE NULL END),2) AS nonbrand_cvr,
+  COUNT(DISTINCT CASE WHEN s.utm_campaign = 'brand' THEN s.website_session_id ELSE NULL END) AS brand_sessions,
+  COUNT(DISTINCT CASE WHEN s.utm_campaign = 'brand' THEN o.order_id ELSE NULL END) AS brand_orders,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN s.utm_campaign = 'brand' THEN o.order_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN s.utm_campaign = 'brand' THEN s.website_session_id ELSE NULL END),2) AS brand_cvr
+FROM website_sessions s
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE s.created_at < '2012-11-27'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign IN ('nonbrand', 'brand')
+GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
+```
+
+<img width="603" alt="image" src="https://user-images.githubusercontent.com/81607668/140636838-1a81092c-a7ac-4eba-abbc-aa46493d0f3c.png">
+
+Insights: Nonbrand session to order rate is steadily growing from 3.28% to 4.19%. Brand conversion rate is slightly inconsistent with highest 9.84% in Apr 2012 and recently averaging at 4-5% in late 2012. Could be due to different brands being promoted in different month or season. It would help to have further breakdown of brands in the campaign.
 
 ### 📌 Q3: While we’re on Gsearch, could you dive into nonbrand, and pull monthly sessions and orders split by device type? I want to flex our analytical muscles a little and show the board we really know our traffic sources.
 
+- Table: year_month | mobile_sessions | mobile_orders | mobile_cvr | desktop_sessions | desktop_orders | desktop_cvr
+
+```sql
+SELECT
+  EXTRACT(YEAR_MONTH FROM s.created_at) AS yr_mth,
+  COUNT(DISTINCT CASE WHEN s.device_type = 'mobile' THEN s.website_session_id ELSE NULL END) AS mobile_sessions,
+  COUNT(DISTINCT CASE WHEN s.device_type = 'mobile' THEN o.order_id ELSE NULL END) AS mobile_orders, 
+  ROUND(100 * COUNT(DISTINCT CASE WHEN s.device_type = 'mobile' THEN o.order_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN s.device_type = 'mobile' THEN s.website_session_id ELSE NULL END),2) AS mobile_cvr,
+  COUNT(DISTINCT CASE WHEN s.device_type = 'desktop' THEN s.website_session_id ELSE NULL END) AS desktop_sessions,
+  COUNT(DISTINCT CASE WHEN s.device_type = 'desktop' THEN o.order_id ELSE NULL END) AS desktop_orders,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN s.device_type = 'desktop' THEN o.order_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN s.device_type = 'desktop' THEN s.website_session_id ELSE NULL END),2) AS desktop_cvr
+FROM website_sessions s
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE s.created_at < '2012-11-27'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
+```
+
+<img width="538" alt="image" src="https://user-images.githubusercontent.com/81607668/140636873-4db9e55e-3522-4d1e-a867-d6080c622b0b.png">
+
+Insights: Bulk of session to orders are contributed by users on desktop devices with good growth from 4.45% in Mar 2012 to 5.04% in Nov 2021. Investigate why mobile rate is low - maybe not user-friendly or pages are not displayed properly on mobile phone browser. Consider moving bids to desktop to optimize traffic and marketing spend.
+
 ### 📌 Q4: I’m worried that one of our more pessimistic board members may be concerned about the large % of traffic from Gsearch. Can you pull monthly trends for Gsearch, alongside monthly trends for each of our other channels?
 
+- Table: yearmonth | sessions | gsearch_session | gsearch_rate | bsearch_session | bsearch_rate
+
+```sql
+SELECT
+  DISTINCT utm_source,
+  utm_campaign,
+  http_referer
+FROM website_sessions
+WHERE created_at < '2012-11-27';
+```
+
+- If source, campaign and http referral is NULL, then it is direct traffic - users type in the website link in the browser's search bar.
+- If source and campaign is NULL, but there is http referral, then it is organic search - coming from search engine and not tagged with paid parameters.
+
+```sql 
+SELECT
+  EXTRACT(YEAR_MONTH FROM created_at) AS yr_mth,
+  COUNT(DISTINCT website_session_id) AS sessions,
+  COUNT(DISTINCT CASE WHEN utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS gsearch_paid_session,
+  COUNT(DISTINCT CASE WHEN utm_source = 'bsearch' THEN website_session_id ELSE NULL END) AS bsearch_paid_session,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL AND http_referer IS NOT NULL THEN website_session_id ELSE NULL END) AS organic_search_session,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL AND http_referer IS NULL THEN website_session_id ELSE NULL END) AS direct_search_session
+FROM website_sessions
+WHERE created_at < '2012-11-27'
+GROUP BY EXTRACT(YEAR_MONTH FROM created_at);
+```
+
+<img width="652" alt="image" src="https://user-images.githubusercontent.com/81607668/140637462-2180a38d-c133-4b34-839c-1c6248f2514c.png">
+
+Insights: Gsearch traffic started out high in Mar 2012 with 98%, then slowly dropped to 70%. Bsearch traffic picked up in Aug 2012 and grow to 22% in Nov 20122. There are 10-15% null traffic. Identify what it means by null traffic.
+
 ### 📌 Q5: I’d like to tell the story of our website performance improvements over the course of the first 8 months. Could you pull session to order conversion rates, by month?
+
+- Table: yearmonth | sessions | orders | conversion_rate
+
+```sql
+SELECT
+  EXTRACT(YEAR_MONTH FROM s.created_at) AS yearmonth,
+  COUNT(DISTINCT CASE WHEN s.website_session_id IS NOT NULL THEN s.website_session_id ELSE NULL END) AS sessions,
+  COUNT(DISTINCT CASE WHEN o.order_id IS NOT NULL THEN o.order_id ELSE NULL END) AS orders, 
+  ROUND(100 * COUNT(DISTINCT CASE WHEN o.order_id IS NOT NULL THEN o.order_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN s.website_session_id IS NOT NULL THEN s.website_session_id ELSE NULL END),2) AS conversion_rate
+FROM website_sessions s
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE s.created_at < '2012-11-27'
+GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
+```
+
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/140638003-af3e2fd3-880d-4a8e-b3d1-5b5f6eb980e1.png">
 
 ### 📌 Q6: For the gsearch lander test, please estimate the revenue that test earned us (Hint: Look at the increase in CVR from the test (Jun 19 – Jul 28), and use nonbrand sessions and revenue since then to calculate incremental value)
 
