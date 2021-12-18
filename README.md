@@ -772,7 +772,135 @@ GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
 
 ### 📌 Q6: For the gsearch lander test, please estimate the revenue that test earned us (Hint: Look at the increase in CVR from the test (Jun 19 – Jul 28), and use nonbrand sessions and revenue since then to calculate incremental value)
 
+- Revenue from Jun 19 – Jul 28 vs same period
+
+```sql
+-- Find the first lander-1 website_pageview_id
+SELECT
+  MIN(website_pageview_id)
+FROM website_pageviews
+WHERE pageview_url = '/lander-1';
+```
+
+The first pageview url website_pageview_id = 23504
+
+```sql
+SELECT
+  p.pageview_url AS landing_page,
+  COUNT(DISTINCT s.website_session_id) AS sessions,
+  COUNT(DISTINCT o.order_id) AS orders,
+  ROUND(100 * COUNT(DISTINCT o.order_id)/
+    COUNT(DISTINCT s.website_session_id),2) AS conversion_rate
+FROM website_sessions s
+INNER JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE p.website_pageview_id >= 23504
+  AND s.created_at < '2012-07-28'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+  AND p.pageview_url IN ('/home', '/lander-1')
+GROUP BY p.pageview_url;
+``` 
+
+Homepage's conversion rate is 3.11% and the new page lander-1's conversion rate is 4.14%. Incremental difference in website performance is 1.03% using lander-1.
+
+```sql
+SELECT
+  MAX(s.website_session_id)
+FROM website_sessions s
+LEFT JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+WHERE s.created_at < '2012-11-27'
+  AND s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+  AND p.pageview_url = '/home';
+-- the last website session with gsearch nonbrand paid campaign = 17145
+
+SELECT
+  COUNT(website_session_id) AS sessions_since_test
+FROM website_sessions
+WHERE created_at < '2012-11-27'
+  AND website_session_id > 17145 -- last home session
+  AND utm_source = 'gsearch'
+  AND utm_campaign = 'nonbrand';
+```
+
+-- improved total sessions using lander-1 = 21,729
+-- 21,729 x 1.03% (incremental % of order) = estimated at least 223 incremental orders since 29 Jul using lander-1 page
+-- 223/4 months = 55 additional orders per month!
+-- Increased performance of website and quantified the performance of the additional website sessions 
+
+
 ### 📌 Q7: For the landing page test you analyzed previously, it would be great to show a full conversion funnel from each of the two pages to orders. You can use the same time period you analyzed last time (Jun 19 – Jul 28).
+
+CREATE TEMPORARY TABLE flagged_sessions_summary
+SELECT
+  website_session_id,
+  MAX(homepage) AS saw_homepage,
+  MAX(custom_lander) AS saw_custom_lander,
+  MAX(products_page) AS product_made_it,
+  MAX(mrfuzzy_page) AS mrfuzzy_page_made_it,  
+  MAX(cart_page) AS cart_page_made_it,  
+  MAX(shipping_page) AS shipping_page_made_it,
+  MAX(billing_page) AS billing_page_made_it,  
+  MAX(thankyou_page) AS thankyou_page_made_it 
+FROM (
+SELECT
+  s.website_session_id,
+  CASE WHEN p.pageview_url = '/home' THEN 1 ELSE 0 END AS homepage,
+  CASE WHEN p.pageview_url = '/lander-1' THEN 1 ELSE 0 END AS custom_lander,
+  CASE WHEN p.pageview_url = '/products' THEN 1 ELSE 0 END AS products_page,
+  CASE WHEN p.pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page,
+  CASE WHEN p.pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+  CASE WHEN p.pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+  CASE WHEN p.pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+  CASE WHEN p.pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+FROM website_sessions s
+LEFT JOIN website_pageviews p
+  ON s.website_session_id = p.website_session_id
+WHERE s.utm_source = 'gsearch'
+  AND s.utm_campaign = 'nonbrand'
+  AND s.created_at BETWEEN '2012-06-19' AND '2012-07-28'
+ORDER BY s.website_session_id, p.created_at) AS flagged_sessions
+GROUP BY website_session_id;
+
+SELECT
+  CASE WHEN saw_homepage = 1 THEN 'saw_homepage'
+    WHEN saw_custom_lander = 1 THEN 'saw_custom_lander'
+    ELSE 'check logic' END AS segment,
+  COUNT(DISTINCT website_session_id) AS sessions,
+  COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) AS to_products,
+  COUNT(DISTINCT CASE WHEN mrfuzzy_page_made_it = 1 THEN website_session_id ELSE NULL END) AS to_mrfuzzy,
+  COUNT(DISTINCT CASE WHEN cart_page_made_it = 1 THEN website_session_id ELSE NULL END) AS to_cart,
+  COUNT(DISTINCT CASE WHEN shipping_page_made_it = 1 THEN website_session_id ELSE NULL END) AS to_shipping,
+  COUNT(DISTINCT CASE WHEN billing_page_made_it = 1 THEN website_session_id ELSE NULL END) AS to_billing,
+  COUNT(DISTINCT CASE WHEN thankyou_page_made_it = 1 THEN website_session_id ELSE NULL END) AS to_thankyou
+FROM flagged_sessions_summary
+GROUP BY segment;
+
+SELECT
+  CASE WHEN saw_homepage = 1 THEN 'saw_homepage'
+    WHEN saw_custom_lander = 1 THEN 'saw_custom_lander'
+    ELSE 'check logic' END AS segment,
+  COUNT(DISTINCT website_session_id) AS sessions,
+  ROUND(100*COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS product_click_rt,
+  ROUND(100*COUNT(DISTINCT CASE WHEN mrfuzzy_page_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS mrfuzzy_click_rt,
+  ROUND(100*COUNT(DISTINCT CASE WHEN cart_page_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS cart_click_rt,
+  ROUND(100*COUNT(DISTINCT CASE WHEN shipping_page_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS shipping_click_rt,
+  ROUND(100*COUNT(DISTINCT CASE WHEN billing_page_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS billing_click_rt,
+  ROUND(100*COUNT(DISTINCT CASE WHEN thankyou_page_made_it = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS thankyou_click_rt
+FROM flagged_sessions_summary
+GROUP BY segment;
+
+
 
 ### 📌 Q8: I’d love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the test (Sep 10 – Nov 10), in terms of revenue per billing page session, and then pull the number of billing page sessions for the past month to understand monthly impact.
 
