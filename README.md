@@ -713,7 +713,7 @@ Insights: Gsearch traffic started out high in Mar 2012 with 98%, then slowly dro
 
 ### 📌 Q5: I’d like to tell the story of our website performance improvements over the course of the first 8 months. Could you pull session to order conversion rates, by month?
 
-- Table: yearmonth | sessions | orders | conversion_rate
+- **Table:** yearmonth | sessions | orders | conversion_rate
 
 ```sql
 SELECT
@@ -796,6 +796,7 @@ WHERE created_at < '2012-11-27'
 
 ### 📌 Q7: For the landing page test you analyzed previously, it would be great to show a full conversion funnel from each of the two pages to orders. You can use the same time period you analyzed last time (Jun 19 – Jul 28).
 
+```sql
 CREATE TEMPORARY TABLE flagged_sessions_summary
 SELECT
   website_session_id,
@@ -841,6 +842,8 @@ SELECT
 FROM flagged_sessions_summary
 GROUP BY segment;
 
+-- Categorise website sessions under `segment` by 'saw_homepage' or 'saw_custom_lander'
+-- Convert aggregated website sessions to percentage of click rate by dividing by total sessions
 SELECT
   CASE WHEN saw_homepage = 1 THEN 'saw_homepage'
     WHEN saw_custom_lander = 1 THEN 'saw_custom_lander'
@@ -860,8 +863,11 @@ SELECT
     COUNT(DISTINCT website_session_id),2) AS thankyou_click_rt
 FROM flagged_sessions_summary
 GROUP BY segment;
+```
 
+<img width="693" alt="image" src="https://user-images.githubusercontent.com/81607668/170445488-afb17bea-b93b-4290-aa96-29f73eb99bac.png">
 
+**Insights:** Custom lander page has overall better click through rate as compared to the original homepage. 
 
 ### 📌 Q8: I’d love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the test (Sep 10 – Nov 10), in terms of revenue per billing page session, and then pull the number of billing page sessions for the past month to understand monthly impact.
 
