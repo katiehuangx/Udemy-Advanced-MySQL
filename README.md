@@ -486,66 +486,64 @@ Homepage > Product Page > Add to Cart > Sale
 
 ```sql
 -- Step 1: Select all pageviews fr relevant session
-WITH pageviews_cte AS (
-SELECT
+WITH pageview_cte AS (
+SELECT 
   s.website_session_id,
   p.pageview_url,
-  CASE WHEN p.pageview_url = '/products' THEN 1 ELSE 0 END AS product_page,
-  CASE WHEN p.pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page,
-  CASE WHEN p.pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
-  CASE WHEN p.pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
-  CASE WHEN p.pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
-  CASE WHEN p.pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+  CASE WHEN p.pageview_url = '/products' THEN 1 ELSE 0 END AS to_products,
+  CASE WHEN p.pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS to_mrfuzzy,
+  CASE WHEN p.pageview_url = '/cart' THEN 1 ELSE 0 END AS to_cart,
+  CASE WHEN p.pageview_url = '/shipping' THEN 1 ELSE 0 END AS to_shipping,
+  CASE WHEN p.pageview_url = '/billing' THEN 1 ELSE 0 END AS to_billing,
+  CASE WHEN p.pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS to_thankyou
 FROM website_sessions s
 LEFT JOIN website_pageviews p
   ON s.website_session_id = p.website_session_id
 WHERE s.created_at BETWEEN '2012-08-05' AND '2012-09-05'
-  AND s.utm_source = 'gsearch'
   AND s.utm_campaign = 'nonbrand'
-  AND p.pageview_url IN ('/lander-1', '/products', '/the-original-mr-fuzzy', 
-    '/cart', '/shipping', '/billing', '/thank-you-for-your-order')
+  AND s.utm_source = 'gsearch'
 ),
 -- Step 2: Identify each relevant pageview as specific funnel step
 -- Step 3: Create session-level conversion funnel view
-session_level_cte AS (
+summary_cte AS (
 SELECT
   website_session_id, 
-  MAX(product_page) AS product_madeit,
-  MAX(mrfuzzy_page) AS mrfuzzy_madeit,
-  MAX(cart_page) AS cart_madeit,
-  MAX(shipping_page) AS shipping_madeit,
-  MAX(billing_page) AS billing_madeit,
-  MAX(thankyou_page) AS thankyou_madeit
-FROM pageviews_cte
+  MAX(to_products) AS product_views,
+  MAX(to_mrfuzzy) AS mrfuzzy_views,
+  MAX(to_cart) AS cart_views,
+  MAX(to_shipping) AS shipping_views,
+  MAX(to_billing) AS billing_views,
+  MAX(to_thankyou) AS thankyou_views
+FROM pageview_cte
 GROUP BY website_session_id
 )
 -- Step 4: Aggregate data to assess funnel performance
 SELECT
-  COUNT(DISTINCT website_session_id) AS sessions,
-  ROUND(100 * COUNT(CASE WHEN product_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(DISTINCT website_session_id),2) AS lander_clickrate,
-  ROUND(100 * COUNT(CASE WHEN mrfuzzy_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(CASE WHEN product_madeit = 1 THEN 1 ELSE NULL END),2) AS products_clickrate,
-  ROUND(100 * COUNT(CASE WHEN cart_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(CASE WHEN mrfuzzy_madeit = 1 THEN 1 ELSE NULL END),2) AS mrfuzzy_clickrate,
-  ROUND(100 * COUNT(CASE WHEN shipping_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(CASE WHEN cart_madeit = 1 THEN 1 ELSE NULL END),2) AS cart_clickrate,
-  ROUND(100 * COUNT(CASE WHEN billing_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(CASE WHEN shipping_madeit = 1 THEN 1 ELSE NULL END),2) AS shipping_clickrate,
-  ROUND(100 * COUNT(CASE WHEN thankyou_madeit = 1 THEN 1 ELSE NULL END)/
-    COUNT(CASE WHEN billing_madeit = 1 THEN 1 ELSE NULL END),2) AS billing_clickrate
-FROM session_level_cte;
+  COUNT(DISTINCT website_session_id) AS sessions, -- total sessions
+  ROUND(100 * COUNT(CASE WHEN product_views = 1 THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT website_session_id),2) AS products_click_rate, --   product views / total sessions
+  ROUND(100 * COUNT(CASE WHEN mrfuzzy_views = 1 THEN website_session_id ELSE NULL END)/ 
+    COUNT(CASE WHEN product_views = 1 THEN website_session_id ELSE NULL END),2) AS mrfuzzy_click_rate, -- mrfuzzy views / product views
+  ROUND(100 * COUNT(CASE WHEN cart_views = 1 THEN website_session_id ELSE NULL END)/ 
+    COUNT(CASE WHEN mrfuzzy_views = 1 THEN website_session_id ELSE NULL END),2) AS cart_click_rate, -- cart views / mrfuzzy views
+  ROUND(100 * COUNT(CASE WHEN shipping_views = 1 THEN website_session_id ELSE NULL END)/ 
+    COUNT(CASE WHEN mrfuzzy_views = 1 THEN website_session_id ELSE NULL END),2) AS shipping_click_rate, -- shipping views / cart views
+  ROUND(100 * COUNT(CASE WHEN billing_views = 1 THEN website_session_id ELSE NULL END)/ 
+    COUNT(CASE WHEN shipping_views = 1 THEN website_session_id ELSE NULL END),2) AS billing_click_rate, -- billing views / shipping views
+  ROUND(100 * COUNT(CASE WHEN thankyou_views = 1 THEN website_session_id ELSE NULL END)/ 
+    COUNT(CASE WHEN billing_views = 1 THEN website_session_id ELSE NULL END),2) AS cart_click_rate -- thankyou views / billing views
+FROM summary_cte;
 ```
 
-<img width="649" alt="image" src="https://user-images.githubusercontent.com/81607668/140033057-cb36e058-1f0a-4cf6-921b-b2eb4ad46d1c.png">
-
+<img width="677" alt="image" src="https://user-images.githubusercontent.com/81607668/170442720-694c553e-e962-492f-a3ba-e981929d8c4e.png">
 **Insights: **
 - To focus on /lander-1, mrfuzzy and billing pages with lowest clickthrough rate - why are users dropping off on these pages?
 - More information on billing page will make customers more comfortable to insert their credit card information.
 
-### Q12: Analyze conversion funnel test for `/billing` vs. new `/billing-2` pages
-- ST has developed a new `/billing-2` page and wants to test the traffic and billing to order conversion rate of both pages.
-- table: billing_version | sessions | orders | billing_to_order_rate
+### 📌 Q12: Analyze Conversion Funnel Tests for `/billing` vs. new `/billing-2` pages
+<img width="554" alt="image" src="https://user-images.githubusercontent.com/81607668/170443171-cd92d655-fd3b-4f5e-adf3-4c704283fbd3.png">
+- **ST request:** ST developed a new `/billing-2` page and wants to test the traffic and billing to order conversion rate of both pages.
+- **Result:** billing_version | sessions | orders | billing_to_order_rate
 
 ```sql
 -- Step 1: Find when /billing-2 was first active
@@ -581,9 +579,9 @@ GROUP BY b.pageview_url;
 
 <img width="317" alt="image" src="https://user-images.githubusercontent.com/81607668/140033607-c8f07fcf-a56a-460f-ad8d-4e8a0da2bccb.png">
 
-Insights: `/billing-2` page has session to order converstion rate at 62%; much better than billing page at 46%. To request engineering team to roll out new  `/billing-2` page to customers immediately.
+**Insights:** `/billing-2` page has session to order converstion rate at 62%; much better than billing page at 46%. To request engineering team to roll out new  `/billing-2` page to customers immediately.
 
-Next step: Monitor overall sales performance.
+**Next step:** Monitor overall sales performance.
 
 ***
 
@@ -596,14 +594,14 @@ Maven Fuzzy Factory has been live for ~8 months, and your CEO is due to present 
 **✏️ THE OBJECTIVE**
 
 Use SQL to:
-- Extract and analyze website traffic and performance data from the Maven Fuzzy Factory database to quantify the company’s growth, and to tell the story of how you have been able to generate that growth.
+- Extract and analyze website traffic and performance data from the Maven Fuzzy Factory database to **quantify the company’s growth**, and to tell the story of **how you have been able to generate that growth**.
 - As an Analyst, the first part of your job is extracting and analyzing the data, and the next part of your job is effectively communicating the story to your stakeholders.
 
 ### Project Questions
 
 ### 📌 Q1: Gsearch seems to be the biggest driver of our business. Could you pull monthly trends for gsearch sessions and orders so that we can showcase the growth there?
 
-- Table: year month | sessions | orders | session to order rate
+- **Table:** year month | sessions | orders | session to order rate
 
 ```sql
 SELECT
@@ -622,11 +620,11 @@ GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
 
 <img width="271" alt="image" src="https://user-images.githubusercontent.com/81607668/140636799-322905ad-5e44-492f-a5ad-009d23253bac.png">
 
-Insights: Steady growth of gsearch session to order rate from 3.27% in Mar 2012 to 4.23% to Nov 2012. 
+**Insights:** Steady growth of gsearch session to order rate from 3.27% in Mar 2012 to 4.23% to Nov 2012. 
 
 ### 📌 Q2: Next, it would be great to see a similar monthly trend for Gsearch, but this time splitting out nonbrand and brand campaigns separately. I am wondering if brand is picking up at all. If so, this is a good story to tell.
 
-- Table: year_month | nonbrand_sessions | nonbrand_orders | nonbrand_conversion_r | brand_sessions | brand_orders | brand_conversion_r
+- **Table:** year_month | nonbrand_sessions | nonbrand_orders | nonbrand_conversion_r | brand_sessions | brand_orders | brand_conversion_r
 
 ```sql
 SELECT 
@@ -650,11 +648,11 @@ GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
 
 <img width="603" alt="image" src="https://user-images.githubusercontent.com/81607668/140636838-1a81092c-a7ac-4eba-abbc-aa46493d0f3c.png">
 
-Insights: Nonbrand session to order rate is steadily growing from 3.28% to 4.19%. Brand conversion rate is slightly inconsistent with highest 9.84% in Apr 2012 and recently averaging at 4-5% in late 2012. Could be due to different brands being promoted in different month or season. It would help to have further breakdown of brands in the campaign.
+**Insights:** Nonbrand session to order rate is steadily growing from 3.28% to 4.19%. Brand conversion rate is slightly inconsistent with highest 9.84% in Apr 2012 and recently averaging at 4-5% in late 2012. Could be due to different brands being promoted in different month or season. It would help to have further breakdown of brands in the campaign.
 
 ### 📌 Q3: While we’re on Gsearch, could you dive into nonbrand, and pull monthly sessions and orders split by device type? I want to flex our analytical muscles a little and show the board we really know our traffic sources.
 
-- Table: year_month | mobile_sessions | mobile_orders | mobile_cvr | desktop_sessions | desktop_orders | desktop_cvr
+- **Table:** year_month | mobile_sessions | mobile_orders | mobile_cvr | desktop_sessions | desktop_orders | desktop_cvr
 
 ```sql
 SELECT
