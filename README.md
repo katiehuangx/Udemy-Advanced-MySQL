@@ -72,12 +72,12 @@ Click here to expand tables!
 
 ## Analyzing Traffic Sources
 
-Traffic Source Analysis
+**Traffic Source Analysis**
 - Understanding where the customers are coming from and which channels are driving the highest quality traffic. 
 - Typically, traffic sources are email, social media, search engine, and direct traffic. 
 - Looking at conversion rate (CVR) which is the percentage of the traffic that converts into sales or revenue activity.
 
-Why is it important to conduct Conversion Rate Analysis?
+**Why is it important to conduct Conversion Rate Analysis?**
 - Shift budget towards search engines, campaigns, or keywords driving the highest conversion rate.
 - Compare user behaviour across traffic sources to customize messaging strategy.
 - Identify opportunities to eliminate paid marketing channel or scale performing traffic.
@@ -133,9 +133,7 @@ WHERE wb.created_at < '2012-04-14'
 <img width="220" alt="image" src="https://user-images.githubusercontent.com/81607668/139543484-4c50ff9c-7302-4189-897c-9760872f2811.png">
 **Insights:** Conversion rate is 2.92%, which is less than 4%, hence we're overspending on gsearch nonbrand campaign and have to reduce bids. To monitor impact of bid reduction for the campaign.
 
-***
-
-## Analyse Bid Optimization
+### Bid Optimization & Trend Analysis
 
 Analysing for bid optimization is understanding the value of various segments of paid traffic to optimize marketing budget.
 - Our job is to figure out the right amount of bid for various segments of traffic based on our potential revenue. 
@@ -286,9 +284,7 @@ ORDER BY landing_page_url DESC;
 - **Insights:** Home page is the top landing page. What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - **Possible metrics:** Repeat sessions? Which day and time most viewed? By source, campaign, device type?
 
-*** 
-
-## Landing Page Performance and Testing
+### Landing Page Performance and Testing
 
 ### 📌 Q8: Calculating Bounce Rates
 <img width="552" alt="image" src="https://user-images.githubusercontent.com/81607668/170436364-ae25103d-e2b7-4ffe-87f1-0424f2afa755.png">
@@ -464,11 +460,11 @@ GROUP BY WEEK(created_at);
 
 **Insights:** Before 2012-06-17, all traffic were routed to home, then after 2012-08-05 all traffic is routed to lander-1. Bounce rate dropped from 60%+ to nearing 50% so there is improvement. Changes made to `/lander-1` page is working well.
 
-## Analyzing and Testing Conversion Funnels
+### Analyzing and Testing Conversion Funnels
 
 Conversion funnel analysis is about understanding and optimizing each step of user's experience on their journey towards purchasing our products.
 
-Homepage > Product Page > Add to Cart > Sale
+**Homepage > Product Page > Add to Cart > Sale**
 
 - Identify most common paths customers take before purchasing our products.
 - Identify how many of the users continue to the next step in the conversion funnel and how many users abandon at each step.
@@ -713,11 +709,13 @@ Insights: Gsearch traffic started out high in Mar 2012 with 98%, then slowly dro
 
 ### 📌 Q5: I’d like to tell the story of our website performance improvements over the course of the first 8 months. Could you pull session to order conversion rates, by month?
 
-- **Table:** yearmonth | sessions | orders | conversion_rate
+- ST request: Calculate conversion rate of orders based on sessions
+- Result: yearmonth | sessions | orders | conversion_rate
 
 ```sql
 SELECT
-  EXTRACT(YEAR_MONTH FROM s.created_at) AS yearmonth,
+  YEAR(s.created_at) AS yr,
+  MONTH(s.created_at) AS mth,
   COUNT(DISTINCT CASE WHEN s.website_session_id IS NOT NULL THEN s.website_session_id ELSE NULL END) AS sessions,
   COUNT(DISTINCT CASE WHEN o.order_id IS NOT NULL THEN o.order_id ELSE NULL END) AS orders, 
   ROUND(100 * COUNT(DISTINCT CASE WHEN o.order_id IS NOT NULL THEN o.order_id ELSE NULL END)/
@@ -726,10 +724,12 @@ FROM website_sessions s
 LEFT JOIN orders o
   ON s.website_session_id = o.website_session_id
 WHERE s.created_at < '2012-11-27'
-GROUP BY EXTRACT(YEAR_MONTH FROM s.created_at);
+GROUP BY YEAR(s.created_at), MONTH(s.created_at);
 ```
 
-<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/140638003-af3e2fd3-880d-4a8e-b3d1-5b5f6eb980e1.png">
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/170808375-03f0a66c-4f2f-480b-886c-590e1ecd1625.png">
+
+Insights: Conversion rate increased from 3.23% in March 2012 to 4.45% in November. Rates start to hit 4% in September.
 
 ### 📌 Q6: For the gsearch lander test, please estimate the revenue that test earned us (Hint: Look at the increase in CVR from the test (Jun 19 – Jul 28), and use nonbrand sessions and revenue since then to calculate incremental value)
 
@@ -764,6 +764,7 @@ WHERE p.website_pageview_id >= 23504
   AND p.pageview_url IN ('/home', '/lander-1')
 GROUP BY p.pageview_url;
 ``` 
+<img width="297" alt="image" src="https://user-images.githubusercontent.com/81607668/170808139-e5c195bc-b9e6-4c7c-aa7f-ceb11a71a269.png">
 
 Homepage's conversion rate is 3.11% and the new page lander-1's conversion rate is 4.14%. Incremental difference in website performance is 1.03% using lander-1.
 
@@ -788,10 +789,13 @@ WHERE created_at < '2012-11-27'
   AND utm_campaign = 'nonbrand';
 ```
 
--- improved total sessions using lander-1 = 21,729
--- 21,729 x 1.03% (incremental % of order) = estimated at least 223 incremental orders since 29 Jul using lander-1 page
--- 223/4 months = 55 additional orders per month!
--- Increased performance of website and quantified the performance of the additional website sessions 
+<img width="145" alt="image" src="https://user-images.githubusercontent.com/81607668/170808159-a39d180a-824f-47d4-bc53-f78e61386ee5.png">
+
+**Insights:** 
+- Improved total sessions using `\lander-1` = 21,729
+- 21,729 x 1.03% (incremental % of order) = estimated at least 223 incremental orders since 29 Jul using `\lander-1` page
+- 223/4 months = 55 additional orders per month!
+- Increased performance of website and quantified the performance of the additional website sessions.
 
 
 ### 📌 Q7: For the landing page test you analyzed previously, it would be great to show a full conversion funnel from each of the two pages to orders. You can use the same time period you analyzed last time (Jun 19 – Jul 28).
@@ -912,8 +916,22 @@ WHERE pageview_url IN ('/billing', '/billing-2')
 <img width="85" alt="image" src="https://user-images.githubusercontent.com/81607668/170807652-e6c50539-ded2-4da3-96bd-97b3e5a36304.png">
 
 **Insights: **
-- $23.04 for old '\billing' page and $31.31 for new '\billing-2' page. There is lift of $8.27 per billing page view; increased by 35%.
+- $23.04 for old '\billing' page and $31.31 for new '\billing-2' page. Lift of $8.27 per billing page view; increased by 35%.
 - Over the past month, there are 1,021 sessions and with the increase of $8.27 average revenue per session, we are looking at a positive impact of $8,443.67 increase in revenue.
 
 ***
 
+## Analysis for Channel Portfolio Management
+
+Analyzing a portfolio of marketing channels is about bidding efficiently and using data to maximise the effectiveness of your marketing budget.
+- Understanding which marketing channels are driving the most sessions and orders through your website.
+- Understanding differences in user characteristics and conversion performance across marketing channels.
+- Optimising bids and allocating marketing spend across multi-channel portfolio to achieve marketing performance.
+
+### Analyzing Channel Portfolios
+
+### 📌 Q13: Analyzing Channel Portfolios 
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/170812973-1f8fc008-2c64-4200-8f79-c9177d680f26.png">
+
+- ST request: Pull weekly sessions from 22 Aug to 29 Nov for gsearch and bsearch
+- Result: weekly | gsearch_sessions | bsearch_sessions
