@@ -871,5 +871,49 @@ GROUP BY segment;
 
 ### 📌 Q8: I’d love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the test (Sep 10 – Nov 10), in terms of revenue per billing page session, and then pull the number of billing page sessions for the past month to understand monthly impact.
 
+- ST request: Calculate the sessions for `/billing` and `/billing-2` and revenue per billing page from Sep 10 – Nov 10
+- Result: billing_version | sessions (count) | revenue per billing session
+
+```sql
+-- Pull out relevant data ie. website session id, page url, order id and prices associated with the billing pages
+WITH billing_revenue AS (
+SELECT 
+  p.website_session_id, 
+  p.pageview_url AS billing_version, -- Page url associated with the website session id
+  o.order_id, -- 
+  o.price_usd -- Billing associated with each order id. It represents the revenue
+FROM website_pageviews p
+LEFT JOIN orders o
+  ON p.website_session_id = o.website_session_id
+WHERE p.created_at BETWEEN '2012-09-10' AND '2012-11-10'
+  AND p.pageview_url IN ('/billing', '/billing-2'))
+```
+
+<img width="329" alt="image" src="https://user-images.githubusercontent.com/81607668/170806763-43e92bbb-88ae-42b9-bdc4-d5423305810a.png">
+
+```sql
+SELECT 
+  billing_version,
+  COUNT(DISTINCT website_session_id) AS sessions, -- 
+  SUM(price_usd)/COUNT(DISTINCT website_session_id) AS revenue_per_billing_page
+FROM billing_revenue
+GROUP BY billing_version;
+```
+<img width="327" alt="image" src="https://user-images.githubusercontent.com/81607668/170806793-d4491997-3519-4697-891a-002cd9331d1d.png">
+
+```sql
+SELECT 
+  COUNT(website_session_id) AS sessions
+FROM website_pageviews
+WHERE pageview_url IN ('/billing', '/billing-2')
+  AND created_at BETWEEN '2012-10-27' AND '2012-11-27';
+```
+
+<img width="85" alt="image" src="https://user-images.githubusercontent.com/81607668/170807652-e6c50539-ded2-4da3-96bd-97b3e5a36304.png">
+
+**Insights: **
+- $23.04 for old '\billing' page and $31.31 for new '\billing-2' page. There is lift of $8.27 per billing page view; increased by 35%.
+- Over the past month, there are 1,021 sessions and with the increase of $8.27 average revenue per session, we are looking at a positive impact of $8,443.67 increase in revenue.
+
 ***
 
