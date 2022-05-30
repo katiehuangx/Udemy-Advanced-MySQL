@@ -1028,3 +1028,31 @@ Insights:
 - As for mobile sessions, there was a sharp fall after bids were reduced, but was fluctuating throughout December, so it was hard to isolate whether it was due to reduced bids or other factors as well.
 
 ### Analying Direct Traffic
+
+### 📌 Q16: Analyzing Free Channels
+- ST request: Pull organic search, direct type in and paid brand sessions by month. Present in % of paid nonbrand
+- Result: yr | mo | nonbrand | brand | brand_pct_of_nonbrand | direct | direct_pct_of_nonbrand | organic | organic_pct_of_nonbrand
+
+```sql
+SELECT
+  YEAR(created_at) AS yr,
+  MONTH(created_at) AS mo,
+  COUNT(DISTINCT CASE WHEN utm_campaign = 'nonbrand' THEN website_session_id ELSE NULL END) AS nonbrand,
+  COUNT(DISTINCT CASE WHEN utm_campaign = 'brand' THEN website_session_id ELSE NULL END) AS brand,
+  COUNT(DISTINCT CASE WHEN utm_campaign = 'brand' THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN utm_campaign = 'nonbrand' THEN website_session_id ELSE NULL END) AS brand_pct_of_nonbrand,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL and http_referer IS NULL THEN website_session_id ELSE NULL END) AS direct,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL and http_referer IS NULL THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN utm_campaign = 'nonbrand' THEN website_session_id ELSE NULL END) AS direct_pct_of_nonbrand,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL AND http_referer IN ('https://www.bsearch.com', 'https://www.gsearch.com') THEN website_session_id END) AS organic,
+  COUNT(DISTINCT CASE WHEN utm_source IS NULL AND http_referer IN ('https://www.bsearch.com', 'https://www.gsearch.com') THEN website_session_id END)/
+    COUNT(DISTINCT CASE WHEN utm_campaign = 'nonbrand' THEN website_session_id ELSE NULL END) AS organic_pct_of_nonbrand
+FROM website_sessions
+WHERE created_at < '2012-12-23'
+GROUP BY YEAR(created_at), MONTH(created_at);
+```
+
+<img width="696" alt="image" src="https://user-images.githubusercontent.com/81607668/170958982-da5530ed-b4e4-4ca3-aeea-b7099f9e4853.png">
+
+Insights: 
+
