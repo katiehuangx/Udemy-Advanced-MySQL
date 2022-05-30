@@ -915,7 +915,7 @@ WHERE pageview_url IN ('/billing', '/billing-2')
 
 <img width="85" alt="image" src="https://user-images.githubusercontent.com/81607668/170807652-e6c50539-ded2-4da3-96bd-97b3e5a36304.png">
 
-**Insights: **
+**Insights:**
 - $23.04 for old '\billing' page and $31.31 for new '\billing-2' page. Lift of $8.27 per billing page view; increased by 35%.
 - Over the past month, there are 1,021 sessions and with the increase of $8.27 average revenue per session, we are looking at a positive impact of $8,443.67 increase in revenue.
 
@@ -935,3 +935,96 @@ Analyzing a portfolio of marketing channels is about bidding efficiently and usi
 
 - ST request: Pull weekly sessions from 22 Aug to 29 Nov for gsearch and bsearch
 - Result: weekly | gsearch_sessions | bsearch_sessions
+
+```sql
+SELECT
+  MIN(DATE(created_at)) AS week_start_date,
+  COUNT(DISTINCT CASE WHEN utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS gsearch_sessions,
+  COUNT(DISTINCT CASE WHEN utm_source = 'bsearch' THEN website_session_id ELSE NULL END) AS bsearch_sessions,
+    COUNT(DISTINCT CASE WHEN utm_source = 'bsearch' THEN website_session_id ELSE NULL END)/ -- Added additional conversion rate
+    COUNT(DISTINCT CASE WHEN utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS bsearch_rate
+FROM website_sessions
+WHERE utm_campaign = 'nonbrand'
+  AND created_at BETWEEN '2012-08-22' AND '2012-11-29'
+GROUP BY WEEK(created_at);
+```
+
+<img width="368" alt="image" src="https://user-images.githubusercontent.com/81607668/170911693-dae09a00-2c5f-4fe2-81bf-536f30eea6fa.png">
+
+**Insights:** Conversion rate is showing a consistent 3x impact of new bsearch campaign over original gsearch campaigns in the past 3 months. 
+
+### 📌 Q14: Comparing Channel Characteristics
+
+- ST request: Pull mobile sessions for gsearch and bsearch non brand campaign from 22 Aug - 30 Nov
+- Result: utm_source | sessions | mobile_sessions | mobile_perc
+
+```sql
+SELECT
+  utm_source,
+  COUNT(DISTINCT website_session_id) AS sessions,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) AS mobile_sessions,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END)/ 
+    COUNT(DISTINCT website_session_id) AS mobile_perc
+FROM website_sessions
+WHERE created_at BETWEEN '2012-08-22' AND '2012-11-30'
+  AND utm_campaign = 'nonbrand'
+  AND utm_source IN ('gsearch', 'bsearch')
+GROUP BY utm_source;
+```
+
+<img width="358" alt="image" src="https://user-images.githubusercontent.com/81607668/170913941-cd559385-f654-4c61-99c3-dee3232109bd.png">
+
+### 📌 Q15: Cross-Channel Bid Optimization
+
+- ST request: Pull gsearch and bsearch nonbrand conversion rates from session to orders and slice by device type from 22 Aug - 18 Sep
+- Result: device_type | utm_source | sessions | orders | conversion_rate
+
+```sql
+SELECT 
+  device_type,
+  utm_source,
+  COUNT(DISTINCT s.website_session_id) AS sessions,
+  COUNT(DISTINCT o.order_id) AS orders,
+  COUNT(DISTINCT o.order_id)/
+    COUNT(DISTINCT s.website_session_id) AS conversion_rate
+FROM website_sessions s
+LEFT JOIN orders o
+  ON s.website_session_id = o.website_session_id
+WHERE s.utm_campaign = 'nonbrand'
+  AND s.created_at BETWEEN '2012-08-22' AND '2012-09-18'
+GROUP BY device_type, utm_source;
+```
+
+<img width="434" alt="image" src="https://user-images.githubusercontent.com/81607668/170936255-6103f002-22ca-4bdd-9215-81477cd8a824.png">
+
+**Insights:** `gsearch` campaign has higher conversion rate in both desktop and mobile at 4.75% and 1.16% compared to 3.71% and 0.8% for `bsearch` campaign. Suggest to bid down on 'bsearch' campaigns.
+
+### 📌 Q16: Channel Portfolio Trends
+
+- ST request: Pull gsearch and bsearch nonbrand sessions by device type from 4 Nov - 22 Dec
+- Result: week_start_date | device_type | utm_source | sessions | bsearch_comparison
+
+```sql
+SELECT 
+  MIN(DATE(created_at)) AS week_start_date,
+  COUNT(DISTINCT CASE WHEN device_type = 'desktop' AND utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS gsearch_desktop_sess,
+  COUNT(DISTINCT CASE WHEN device_type = 'desktop' AND utm_source = 'bsearch' THEN website_session_id ELSE NULL END) AS bsearch_desktop_sess,
+  COUNT(DISTINCT CASE WHEN device_type = 'desktop' AND utm_source = 'bsearch' THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN device_type = 'desktop' AND utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS b_perc_of_g_desktop,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' AND utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS gsearch_mob_sess,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' AND utm_source = 'bsearch' THEN website_session_id ELSE NULL END) AS bsearch_mob_sess,
+  COUNT(DISTINCT CASE WHEN device_type = 'mobile' AND utm_source = 'bsearch' THEN website_session_id ELSE NULL END)/
+    COUNT(DISTINCT CASE WHEN device_type = 'mobile' AND utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS b_perc_of_g_mob
+FROM website_sessions
+WHERE created_at > '2012-11-04' AND created_at < '2012-12-22'
+  AND utm_campaign = 'nonbrand'
+GROUP BY WEEK(created_at);
+```
+
+<img width="767" alt="image" src="https://user-images.githubusercontent.com/81607668/170945303-9ca68616-8450-49c4-8253-f34ec3962fd6.png">
+
+Insights:
+- The desktop `bsearch` sessions was consistent at 4% of `gsearch` sessions, but dropped after reduced bids on 2 December. However, it could also be impacted by Black Friday, Cyber Monday and other seasonality factors. 
+- As for mobile sessions, there was a sharp fall after bids were reduced, but was fluctuating throughout December, so it was hard to isolate whether it was due to reduced bids or other factors as well.
+
+### Analying Direct Traffic
