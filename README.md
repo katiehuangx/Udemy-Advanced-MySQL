@@ -2,6 +2,12 @@
 
 ## Introduction
 
+<details> 
+<summary>
+Click here for Introduction! 👋🏻
+	
+</summary>
+	
 **👩🏻‍💼 THE SITUATION** 
 
 You’ve just been hired as an eCommerce Database Analyst for Maven Fuzzy Factory, an online retailer which has just launched their first product.
@@ -19,6 +25,8 @@ Use SQL to:
 - Become the data expert for the company, and the go-to person for mission critical analyses
 - Analyze and optimize the business’ marketing channels, website, and product portfolio
 
+</details> 
+	
 ***
 
 ## Table of Contents
@@ -34,13 +42,12 @@ Use SQL to:
 - [Final Project](#final-project)
 
 ## Entity Relationship Diagram
-
-<kbd><img src="https://user-images.githubusercontent.com/81607668/139528817-09766746-e26b-4aa6-9465-bd5cc58a34cc.png" alt="Image" width="750" height="480"></kbd>
-
 <details>
 <summary>
 Click here to expand tables!
 </summary>
+	
+<kbd><img src="https://user-images.githubusercontent.com/81607668/139528817-09766746-e26b-4aa6-9465-bd5cc58a34cc.png" alt="Image" width="750" height="480"></kbd>
   
 `orders` - Records consist of customers' orders with order id, time when the order is created, website session id, unique user id, product id, count of products purchased, price (revenue), and cost in USD. 
 
@@ -87,7 +94,7 @@ In this section, we will learn about
 - Bid optimization and trend analysis
 
 ### 📌 Q1: Finding Top Traffic Sources
-<img width="373" alt="image" src="https://user-images.githubusercontent.com/81607668/170426536-57a99786-5134-4ac1-a740-462a65e4f1f2.png">
+<img width="295" alt="image" src="https://user-images.githubusercontent.com/81607668/171317382-d6cb4387-3a0b-4c72-a2fc-a0425fe359ca.png">
 
 - **Stakeholder (ST)'s request:** Breakdown of sessions by UTM source, campaign and referring domain up to 12-04-2012
 - **Results:** utm_source | utm_campaign | http_referer | sessions (count)
@@ -107,10 +114,12 @@ ORDER BY total_sessions DESC; -- Sort total sessions by descending showing the h
 
 <img width="421" alt="Screenshot 2022-05-26 at 2 07 42 PM" src="https://user-images.githubusercontent.com/81607668/170427566-cc8b5f7c-72b2-4076-91b3-2725c5c67461.png">
 
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171318070-1151876c-31a6-40ea-ab20-4ac26a8d3623.png">
+
 **Insights:** Drill into gsearch nonbrand campaign traffic to explore potential optimization opportunities.
 
 ### 📌 Q2: Traffic Conversion Rates
-<img width="371" alt="image" src="https://user-images.githubusercontent.com/81607668/170428944-aae98aec-67e4-471a-a999-39e4e78aa492.png">
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171318096-8facb274-2d69-468f-adc5-0fc6056a8bc0.png">
 
 - **ST request:** Calculate CVR from session to order. If CVR is 4% >=, then increase bids to drive volume, otherwise reduce bids.
 - **Results:** sessions (count) | orders (count) | conversion rate
@@ -130,7 +139,8 @@ WHERE wb.created_at < '2012-04-14'
   AND wb.utm_campaign = 'nonbrand';
 ```
 
-<img width="220" alt="image" src="https://user-images.githubusercontent.com/81607668/139543484-4c50ff9c-7302-4189-897c-9760872f2811.png">
+<img width="292" alt="image" src="https://user-images.githubusercontent.com/81607668/171318139-08f4d78b-a070-46f2-9b99-1c919f466ece.png">
+
 **Insights:** Conversion rate is 2.92%, which is less than 4%, hence we're overspending on gsearch nonbrand campaign and have to reduce bids. To monitor impact of bid reduction for the campaign.
 
 ### Bid Optimization & Trend Analysis
@@ -142,10 +152,10 @@ Analysing for bid optimization is understanding the value of various segments of
   - Understand how website and products are performing for subsegments of traffic to optimise within channels. 
   - Analyse impact of bid changes have on ranking 
 
-### 📌 Q3: Traffic Source Trending - After bidding down on Apr 15, 2021, what is the trend and impact on sessions for `gsearch` `nonbrand` campaign?
-<img width="556" alt="image" src="https://user-images.githubusercontent.com/81607668/170430958-debd3f93-cfad-484c-a6eb-271b2ae22eb4.png">
+### 📌 Q3: Traffic Source Trending
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171318231-7deec300-c768-4029-98b0-53acd7bb684f.png">
 
-- **ST request:** Find weekly sessions before 2012-05-10. _I'm going a step forward and provide the conversion rate as well in anticipation that ST will ask for this information._
+- **ST request:** After bidding down on Apr 15, 2021, what is the trend and impact on sessions for `gsearch` `nonbrand` campaign? Find weekly sessions before 2012-05-10. _I'm going a step forward and provide the conversion rate as well in anticipation that ST will ask for this information._
 - **Result:** week_start | session (count) | orders (count) | conversion_rate
 - **Steps:** Filter to < 2012-05-10, utm_source = gsearch, utm_campaign = nonbrand
 
@@ -167,10 +177,13 @@ GROUP BY WEEK(wb.created_at);
 
 <img width="275" alt="image" src="https://user-images.githubusercontent.com/81607668/139573298-51e1fb02-1a8c-4746-ba67-925a2405853a.png">
 
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171318289-ab49b997-1c41-40e2-98f8-4d6ad0e6f239.png">
+
 **Insights**: The sessions and conversion rate after 2021-04-15 has dropped - the campaign is highly sensitive to bid changes. Continue to monitor session volume. We want to make campaigns more efficient by maximising volume at the lowest possible bid.
 
 ### 📌 Q4: Traffic Source Bid Optimization
-<img width="553" alt="image" src="https://user-images.githubusercontent.com/81607668/170432690-1e112ef1-11cb-4230-aa64-cb53dbdf93c6.png">
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171318335-32002c91-8990-42e1-8a93-b0196c5ceb70.png">
+
 - **ST request:** What is the conversion rate from session to order by device type?
 - **Result:** device_type | sessions (count) | orders (count) | conversion_rate
 
@@ -192,10 +205,13 @@ GROUP BY wb.device_type; -- Group by device type
 
 <img width="260" alt="image" src="https://user-images.githubusercontent.com/81607668/139573682-d2ab9eb0-1cd7-457a-884f-bd58ccf1c738.png">
 
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171318369-5fe5b121-c2ee-4a20-b148-87d7bc6a877f.png">
+
 **Insights:** Desktop bids were driving nearly 4% of session to successful orders rate, so we should reduce mobile bids and transfer the paid traffic spent to desktop channel instead.
 
 ### 📌 Q5: Traffic Source Segment Trending
-<img width="556" alt="image" src="https://user-images.githubusercontent.com/81607668/170432638-e7a0242e-055a-461a-977e-f627ff2f9a43.png">
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171318395-a4a722b8-41f6-4a9d-a376-6eb9adde159b.png">
+
 - **ST request:** After bidding up on desktop channel on 2012-05-19, what is the weekly session trend for both desktop and mobile?
 - **Result:** week_start_date | desktop_sessions | mobile_sessions
 - **Steps:** Filter to between 2012-04-15 to 2012-06-19, utm_source = gsearch, utm_campaign = nonbrand
@@ -214,6 +230,8 @@ GROUP BY WEEK(created_at);
 
 <img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/139574114-532ab3a1-457b-4559-9130-6df7c237b932.png">
 
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171318424-4b33a3e3-8b43-4a34-a875-6778da3542f4.png">
+
 **Insights:** After biding up desktop channel on 2012-05-19, there were obvious increase in desktop volume whereas mobile volume has also dropped considerably. ST made the right decision to focus on desktop and able to optimize spend efficiently.
 
 ***
@@ -231,7 +249,7 @@ In this section, we will learn about
 - Building conversion funnels and testing conversion paths
 
 ### 📌 Q6: Identifying Top Website Pages
-<img width="552" alt="image" src="https://user-images.githubusercontent.com/81607668/170433173-1bb15994-ddd6-492a-b48d-a20eaaf89804.png">
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171318612-5344a53c-052a-4647-8e11-0c6d8e9cf215.png">
 
 - **ST request:** Identify most viewed website pages ranked by session volume
 - **Result:** pageview_url | sessions (count)
@@ -249,10 +267,12 @@ ORDER BY page_views DESC;
 
 <img width="216" alt="image" src="https://user-images.githubusercontent.com/81607668/139636941-dfca8add-4466-454a-8d76-3c5e9139bded.png">
 
+<img width="295" alt="image" src="https://user-images.githubusercontent.com/81607668/171318642-72591bb0-7067-44c3-9149-5802e80298e5.png">
+
 - **Insights:** Most viewed pages with highest traffic are **homepage, products, and original Mr Fuzzy**. Is traffic for top landing pages the same?
 
 ### 📌 Q7: Identifying Top Entry Pages
-<img width="556" alt="image" src="https://user-images.githubusercontent.com/81607668/170433687-757c03eb-6823-4822-a3c1-97453b506f74.png">
+<img width="295" alt="image" src="https://user-images.githubusercontent.com/81607668/171318667-f31c2781-c7fd-4cbe-821a-8a1a085cfa6c.png">
 
 Entry/landing page is the page where customer lands on website for the first time.
 - **ST request:** Pull a list of top entry pages
@@ -281,13 +301,15 @@ ORDER BY landing_page_url DESC;
 
 <img width="153" alt="image" src="https://user-images.githubusercontent.com/81607668/139637250-f60c1773-59e3-4708-9eae-3c9cd0b795fc.png">
 
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171318697-24420909-8d62-4433-b350-9dd56cc698e8.png">
+
 - **Insights:** Home page is the top landing page. What other metrics can we use to analyse landing page performance? How do we know the metric can appropriately judge whether a page is performing well or not?
 - **Possible metrics:** Repeat sessions? Which day and time most viewed? By source, campaign, device type?
 
 ### Landing Page Performance and Testing
 
 ### 📌 Q8: Calculating Bounce Rates
-<img width="552" alt="image" src="https://user-images.githubusercontent.com/81607668/170436364-ae25103d-e2b7-4ffe-87f1-0424f2afa755.png">
+<img width="296" alt="image" src="https://user-images.githubusercontent.com/81607668/171318738-a557166e-97bb-432b-be56-6b005e85e4b5.png">
 
 Now that we have the sessions for the landing pages, let's find out their bounce rate.
 
@@ -311,6 +333,10 @@ INNER JOIN website_sessions s
 WHERE p.pageview_url = '/home' 
 GROUP BY p.website_session_id
 ),
+```
+<img width="326" alt="image" src="https://user-images.githubusercontent.com/81607668/171318902-6972b40c-91bc-489e-adcd-b7f1876f44d3.png">
+
+```sql
 - Step 2: Count page views for each session to identify bounces
 bounced_views_cte AS (
 SELECT 
@@ -325,6 +351,10 @@ GROUP BY
   lp.landing_page
 HAVING COUNT(p.website_pageview_id) = 1
 )
+```
+<img width="309" alt="image" src="https://user-images.githubusercontent.com/81607668/171319068-2597bb86-eabc-4fd9-8a2d-b7ea97a2d925.png">
+
+```sql
 - Step 3: Summarize total sessions and bounced sessions
 SELECT 
   COUNT(DISTINCT lp.website_session_id) AS total_sessions, -- number of sessions by landing page
@@ -339,10 +369,12 @@ GROUP BY lp.landing_page;
 
 <img width="268" alt="image" src="https://user-images.githubusercontent.com/81607668/139804071-9f7b4dc3-4bed-46e0-bc59-89b90b3b9747.png">
 
+<img width="292" alt="image" src="https://user-images.githubusercontent.com/81607668/171318771-cca1bc9a-b5ed-4847-bd56-6ed91d2a392c.png">
+
 **Insights:** 60% bounce rate is pretty high especially for paid search.
 
 ### 📌 Q9: Analyzing Landing Page Tests
-<img width="553" alt="image" src="https://user-images.githubusercontent.com/81607668/170436316-935b17a7-48b3-48f7-9eb6-09111421dded.png">
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171319348-c663000e-69b4-4c89-8193-a48c9853675c.png">
 
 ST is running a A/B test on `\lander-1` and `\home` for `gsearch nonbrand` campaign and would like to find out the bounce rates for both pages.
 - **Criteria:** Limit time period to when `\lander-1` started receiving traffic and limit results to < 2012-07-28 to ensure fair comparison.
@@ -375,6 +407,10 @@ INNER JOIN website_sessions s
   AND p.pageview_url IN ('/home','/lander-1') -- A/B test on both pages
 GROUP BY p.website_session_id, p.pageview_url
 ),
+```
+<img width="301" alt="image" src="https://user-images.githubusercontent.com/81607668/171319187-d0635e13-12e8-40f2-a130-b0e18bbf7e75.png">
+
+```sql
 -- Step 3: Count page views for each session to identify bounces
 bounced_views_cte AS (
 SELECT 
@@ -386,6 +422,10 @@ LEFT JOIN website_pageviews p
 GROUP BY lp.website_session_id
 HAVING COUNT(p.website_pageview_id) = 1 -- Filter for page views = 1 view = bounced view
 )
+```
+<img width="233" alt="image" src="https://user-images.githubusercontent.com/81607668/171319265-62a7e901-3958-49cf-abe9-ccfef22b5f73.png">
+
+```sql
 -- Step 4: Summarize total sessions and bounced sessions and calculate bounce rate
 SELECT 
   landing_page,
@@ -401,12 +441,14 @@ GROUP BY lp.landing_page;
 
 <img width="343" alt="image" src="https://user-images.githubusercontent.com/81607668/139808742-1f307189-6633-4765-baf2-57969405f8cd.png">
 
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171319373-59adc93b-7be6-4141-849e-a43f04ff5cdb.png">
+
 **Insights:** Looks like the newly created `/lander-1`'s traffic has improved and bounce rate has reduced too, meaning fewer customers has bounced on the page.  
 
 **Next steps:** Ensure that all new campaigns are directed to the new lander-1 page and monitor the bounce rates.
 
 ### 📌 Q10: Landing Page Trend Analysis
-<img width="555" alt="image" src="https://user-images.githubusercontent.com/81607668/170436710-4c8029cf-11f1-470f-8713-c038f7bdae83.png">
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171319399-477106ef-b077-4ed7-920c-190ff5299d81.png">
 
 - **ST request:** Pull paid gsearch nonbrand campaign traffic on `/home` and `/lander-1` pages, trended weekly since 2012-06-01 and the bounce rates.
 - **Criteria:** Email received on 31 Aug 2021, so limit results between 2012-06-01 to 2012-08-31
@@ -432,6 +474,11 @@ WHERE s.created_at BETWEEN '2012-06-01' AND '2012-08-31'
   AND s.utm_campaign = 'nonbrand'
 GROUP BY s.website_session_id
 ),
+```
+<img width="297" alt="image" src="https://user-images.githubusercontent.com/81607668/171319449-a8a5da76-9885-4af9-ab9d-a5e556b0a1bd.png">
+
+```sql
+),
 summary_cte AS (
 SELECT
   lp.website_session_id,
@@ -443,6 +490,10 @@ FROM landing_pages_cte lp
 INNER JOIN website_pageviews p
   ON lp.first_pageview_id = p.website_pageview_id
 )
+```
+<img width="525" alt="image" src="https://user-images.githubusercontent.com/81607668/171319543-6cbc7cb1-0d75-4b59-96fa-b0d208245706.png">
+
+```sql
 SELECT
   YEARWEEK(created_at) AS year_week,
   MIN(DATE(created_at)) AS week_start, -- 1st day of associated week
@@ -458,6 +509,8 @@ GROUP BY WEEK(created_at);
 
 <img width="558" alt="image" src="https://user-images.githubusercontent.com/81607668/170437950-75753ca5-4d34-42de-9bd5-491cd58588fd.png">
 
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171319595-c6cf09eb-0eea-41e0-887b-0c9fb055bf9e.png">
+
 **Insights:** Before 2012-06-17, all traffic were routed to home, then after 2012-08-05 all traffic is routed to lander-1. Bounce rate dropped from 60%+ to nearing 50% so there is improvement. Changes made to `/lander-1` page is working well.
 
 ### Analyzing and Testing Conversion Funnels
@@ -471,7 +524,7 @@ Conversion funnel analysis is about understanding and optimizing each step of us
 - Optimize critical pain points where users are abandoning so that you can convert more users and sell more products.
 
 ### 📌 Q11: Build Conversion Funnels for `gsearch nonbrand` traffic from `/lander-1` to `/thank you` page
-<img width="555" alt="image" src="https://user-images.githubusercontent.com/81607668/170438083-e437194b-39c2-4630-a91f-208fff292c19.png">
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171319628-a14f9841-56f0-496a-b1d9-389a077c3988.png">
 
 - **Criteria:** Limit results from 2012-08-05 to 2012-09-05
 - **Result:** sessions | lander1 click % | product click % | mrfuzzy click % | cart click % | shipping click % | billing click % | thank you click %
@@ -499,6 +552,10 @@ WHERE s.created_at BETWEEN '2012-08-05' AND '2012-09-05'
   AND s.utm_campaign = 'nonbrand'
   AND s.utm_source = 'gsearch'
 ),
+```
+<img width="647" alt="image" src="https://user-images.githubusercontent.com/81607668/171319726-9c0cfae3-d9a1-48c4-87c8-78b46d84b0e6.png">
+
+```sql
 -- Step 2: Identify each relevant pageview as specific funnel step
 -- Step 3: Create session-level conversion funnel view
 summary_cte AS (
@@ -513,6 +570,10 @@ SELECT
 FROM pageview_cte
 GROUP BY website_session_id
 )
+```
+<img width="683" alt="image" src="https://user-images.githubusercontent.com/81607668/171319827-fb6c151d-d7e1-40d9-93c0-ac58292bf205.png">
+
+```sql
 -- Step 4: Aggregate data to assess funnel performance
 SELECT
   COUNT(DISTINCT website_session_id) AS sessions, -- total sessions
@@ -532,12 +593,16 @@ FROM summary_cte;
 ```
 
 <img width="677" alt="image" src="https://user-images.githubusercontent.com/81607668/170442720-694c553e-e962-492f-a3ba-e981929d8c4e.png">
+
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171319870-fbeb1dc4-aefe-4d88-8181-8d107e4111ec.png">
+
 **Insights: **
 - To focus on /lander-1, mrfuzzy and billing pages with lowest clickthrough rate - why are users dropping off on these pages?
 - More information on billing page will make customers more comfortable to insert their credit card information.
 
 ### 📌 Q12: Analyze Conversion Funnel Tests for `/billing` vs. new `/billing-2` pages
-<img width="554" alt="image" src="https://user-images.githubusercontent.com/81607668/170443171-cd92d655-fd3b-4f5e-adf3-4c704283fbd3.png">
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171319887-cf73ec4b-1b9e-401d-8e31-c533d9bb9dd8.png">
+
 - **ST request:** ST developed a new `/billing-2` page and wants to test the traffic and billing to order conversion rate of both pages.
 - **Result:** billing_version | sessions | orders | billing_to_order_rate
 
@@ -574,6 +639,8 @@ GROUP BY b.pageview_url;
 ```
 
 <img width="317" alt="image" src="https://user-images.githubusercontent.com/81607668/140033607-c8f07fcf-a56a-460f-ad8d-4e8a0da2bccb.png">
+
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171319913-0004fe00-957f-4453-98c5-361f81d8cd30.png">
 
 **Insights:** `/billing-2` page has session to order converstion rate at 62%; much better than billing page at 46%. To request engineering team to roll out new  `/billing-2` page to customers immediately.
 
@@ -686,6 +753,7 @@ SELECT
 FROM website_sessions
 WHERE created_at < '2012-11-27';
 ```
+<img width="338" alt="image" src="https://user-images.githubusercontent.com/81607668/171320004-a26391a5-bc7a-417c-a983-c28a551a8608.png">
 
 - If source, campaign and http referral is NULL, then it is direct traffic - users type in the website link in the browser's search bar.
 - If source and campaign is NULL, but there is http referral, then it is organic search - coming from search engine and not tagged with paid parameters.
@@ -931,10 +999,10 @@ Analyzing a portfolio of marketing channels is about bidding efficiently and usi
 ### Analyzing Channel Portfolios
 
 ### 📌 Q13: Analyzing Channel Portfolios 
-<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/170812973-1f8fc008-2c64-4200-8f79-c9177d680f26.png">
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171320103-01635bd5-154f-4bda-b619-b75e79e5f5d6.png">
 
-- ST request: Pull weekly sessions from 22 Aug to 29 Nov for gsearch and bsearch
-- Result: weekly | gsearch_sessions | bsearch_sessions
+- **ST request:** Pull weekly sessions from 22 Aug to 29 Nov for gsearch and bsearch
+- **Result:** weekly | gsearch_sessions | bsearch_sessions
 
 ```sql
 SELECT
@@ -951,12 +1019,16 @@ GROUP BY WEEK(created_at);
 
 <img width="368" alt="image" src="https://user-images.githubusercontent.com/81607668/170911693-dae09a00-2c5f-4fe2-81bf-536f30eea6fa.png">
 
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/81607668/171320142-3ae5a7ba-c5cb-48f3-9fea-9472f69bdd3a.png">
+
 **Insights:** Conversion rate is showing a consistent 3x impact of new bsearch campaign over original gsearch campaigns in the past 3 months. 
 
 ### 📌 Q14: Comparing Channel Characteristics
 
-- ST request: Pull mobile sessions for gsearch and bsearch non brand campaign from 22 Aug - 30 Nov
-- Result: utm_source | sessions | mobile_sessions | mobile_perc
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171320158-e1cef2d3-93bc-4322-827b-1ae3ae6874cc.png">
+
+- **ST request:** Pull mobile sessions for gsearch and bsearch non brand campaign from 22 Aug - 30 Nov
+- **Result:** utm_source | sessions | mobile_sessions | mobile_perc
 
 ```sql
 SELECT
@@ -974,10 +1046,13 @@ GROUP BY utm_source;
 
 <img width="358" alt="image" src="https://user-images.githubusercontent.com/81607668/170913941-cd559385-f654-4c61-99c3-dee3232109bd.png">
 
-### 📌 Q15: Cross-Channel Bid Optimization
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171320194-e45ee7fe-5555-4811-aa99-ba43fdc11b6d.png">
 
-- ST request: Pull gsearch and bsearch nonbrand conversion rates from session to orders and slice by device type from 22 Aug - 18 Sep
-- Result: device_type | utm_source | sessions | orders | conversion_rate
+### 📌 Q15: Cross-Channel Bid Optimization
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171320250-76563d99-943e-414c-b2b2-e4902aeda20c.png">
+
+- **ST request:** Pull gsearch and bsearch nonbrand conversion rates from session to orders and slice by device type from 22 Aug - 18 Sep
+- **Result:** device_type | utm_source | sessions | orders | conversion_rate
 
 ```sql
 SELECT 
@@ -1000,9 +1075,10 @@ GROUP BY device_type, utm_source;
 **Insights:** `gsearch` campaign has higher conversion rate in both desktop and mobile at 4.75% and 1.16% compared to 3.71% and 0.8% for `bsearch` campaign. Suggest to bid down on 'bsearch' campaigns.
 
 ### 📌 Q16: Channel Portfolio Trends
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/171320267-066e5b60-c81b-468e-b8fa-50d5f71c668d.png">
 
-- ST request: Pull gsearch and bsearch nonbrand sessions by device type from 4 Nov - 22 Dec
-- Result: week_start_date | device_type | utm_source | sessions | bsearch_comparison
+- **ST request:** Pull gsearch and bsearch nonbrand sessions by device type from 4 Nov - 22 Dec
+- **Result:** week_start_date | device_type | utm_source | sessions | bsearch_comparison
 
 ```sql
 SELECT 
@@ -1023,15 +1099,19 @@ GROUP BY WEEK(created_at);
 
 <img width="767" alt="image" src="https://user-images.githubusercontent.com/81607668/170945303-9ca68616-8450-49c4-8253-f34ec3962fd6.png">
 
-Insights:
+<img width="287" alt="image" src="https://user-images.githubusercontent.com/81607668/171320377-2472b08d-4f24-4cfb-8995-c5df48b3f7f4.png">
+
+**Insights:**
 - The desktop `bsearch` sessions was consistent at 4% of `gsearch` sessions, but dropped after reduced bids on 2 December. However, it could also be impacted by Black Friday, Cyber Monday and other seasonality factors. 
 - As for mobile sessions, there was a sharp fall after bids were reduced, but was fluctuating throughout December, so it was hard to isolate whether it was due to reduced bids or other factors as well.
 
 ### Analying Direct Traffic
 
-### 📌 Q16: Analyzing Free Channels
-- ST request: Pull organic search, direct type in and paid brand sessions by month. Present in % of paid nonbrand
-- Result: yr | mo | nonbrand | brand | brand_pct_of_nonbrand | direct | direct_pct_of_nonbrand | organic | organic_pct_of_nonbrand
+### 📌 Q17: Analyzing Free Channels
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171320410-60dd7279-1b6a-44ee-83ff-da49fb1871ed.png">
+
+- **ST request:** Pull organic search, direct type in and paid brand sessions by month. Present in % of paid nonbrand
+- **Result:** yr | mo | nonbrand | brand | brand_pct_of_nonbrand | direct | direct_pct_of_nonbrand | organic | organic_pct_of_nonbrand
 
 ```sql
 SELECT
@@ -1054,5 +1134,185 @@ GROUP BY YEAR(created_at), MONTH(created_at);
 
 <img width="696" alt="image" src="https://user-images.githubusercontent.com/81607668/170958982-da5530ed-b4e4-4ca3-aeea-b7099f9e4853.png">
 
-Insights: 
+<img width="292" alt="image" src="https://user-images.githubusercontent.com/81607668/171320439-477ac083-9bc0-496b-b69e-fdf046416d3c.png">
+
+**Insights: **
+
+***
+
+## Analyzing Seasonality & Business Patterns
+
+### 📌 Q18: Analyzing Seasonality
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/171320599-d3a19ced-b3ed-4e3e-b904-ba6f8d69798d.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171320624-af4fbe70-93a2-40c9-a6b7-cd548f0e0151.png">
+
+**Insights:**
+
+### 📌 Q19: Analyzing Business Patterns
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/171320711-90fc2f5c-2ef6-434d-a8af-2d41a153351e.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171320724-e1741577-6c30-45ec-bc88-bd7991af729e.png">
+
+**Insights:**
+
+***
+
+## Product Analysis
+
+### 📌 Q20: Product Level Sales Analysis
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171320944-87fc4400-1153-4a8d-9493-4b692ad8073e.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171320976-23ec861c-37f5-4fe8-a675-94d316d5da01.png">
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171321008-b69e6b38-9cbf-42bd-aa42-01b88a635cb1.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321028-cc786a9c-91d5-4f21-b108-d81e45f4cbff.png">
+
+**Insights:**
+
+### Product Level Website Analysis
+
+### 📌 Q22: Product Pathing Analysis
+<img width="287" alt="image" src="https://user-images.githubusercontent.com/81607668/171321218-7c8db4f4-3384-48c5-b5a1-d2b86a1186a2.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171321239-e0b4aed0-d2a2-4418-b96c-a4d435ffcb0c.png">
+
+**Insights:**
+
+### 📌 Q23: Product Conversion Funnels
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321285-5df87937-7fd9-48fb-a103-3790de1d793a.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="292" alt="image" src="https://user-images.githubusercontent.com/81607668/171321307-771b508e-4ac9-4c5c-afb8-2cfa240a88a1.png">
+
+**Insights:**
+
+### Cross-Selling Products
+
+### 📌 Q24: Cross-Sell Analysis
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171321353-c792df1b-b851-41ae-93df-1ff136874b05.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321373-9f314744-af27-4f91-9881-74cbf3d34951.png">
+
+**Insights:**
+
+### 📌 Q25: Portfolio Expansion Analysis
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171321393-c9de555f-e2ed-4302-af15-f0dd306e3878.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171321438-1b4ac1c9-e81b-4cfb-b89e-7b935ad904f6.png">
+
+**Insights:**
+
+### Product Refund Analysis
+
+### 📌 Q26: Product Refund Rates
+<img width="291" alt="image" src="https://user-images.githubusercontent.com/81607668/171321511-85b37542-2653-41d8-9298-7db26e5ad7c1.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="289" alt="image" src="https://user-images.githubusercontent.com/81607668/171321546-834cd702-d32d-45c1-b49a-9a946321f52d.png">
+
+**Insights:**
+
+***
+
+## User Analysis
+
+### Analyse Repeat Behaviour
+
+### 📌 Q27: Identifying Repeat Visitors
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/171321676-ac59d791-ef96-45ac-be26-be66d5611139.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="292" alt="image" src="https://user-images.githubusercontent.com/81607668/171321700-27f961a7-6ad4-47a0-9f66-fe13bcd4aa79.png">
+
+**Insights:**
+
+### 📌 Q28: Analyzing Repeat Behaviour
+<img width="288" alt="image" src="https://user-images.githubusercontent.com/81607668/171321756-020a5bf9-04b8-4299-a61c-8163b2ff966d.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321784-c057525c-034d-459e-be13-dcbd0be45559.png">
+
+**Insights:**
+
+### 📌 Q29: New Vs. Repeat Channel Patterns
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321840-d2724912-2e76-45a7-bda6-9cfb1c240d59.png">
+
+- **ST request:**
+- **Result:**
+
+<img width="290" alt="image" src="https://user-images.githubusercontent.com/81607668/171321872-41c1cee2-2a0a-4b2e-992f-7ca762d22c73.png">
+
+**Insights:**
+
+### 📌 Q30: New Vs. Repeat Performance
+<img width="293" alt="image" src="https://user-images.githubusercontent.com/81607668/171321900-c182791a-6d0f-4bd7-ae65-da6e7df8b42e.png">
+
+- **ST request:**
+- **Result:**
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+- **ST request:**
+- **Result:**
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+- **ST request:**
+- **Result:**
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+- **ST request:**
+- **Result:**
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+- **ST request:**
+- **Result:**
+
+**Insights:**
+
+### 📌 Q21: Product Launch Sales Analysis
+- **ST request:**
+- **Result:**
+
+**Insights:**
 
